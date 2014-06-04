@@ -13,13 +13,15 @@ public final class Constants {
 
     public static final String FROM = "from";
     public static final String WHERE = "where";
-    
+
     //**********************************************************************************************
-	public static final String STRING = "STRING";
-	public static final String INT = "INT";
-	public static final String DOUBLE = "DOUBLE";
-	public static final String TIMESTAMP = "TIMESTAMP";
-	public static final String VARCHAR = "VARCHAR";
+    public static final String STRING = "STRING";
+    public static final String INT = "INT";
+    public static final String DOUBLE = "DOUBLE";
+    public static final String TIMESTAMP = "TIMESTAMP";
+    public static final String VARCHAR = "VARCHAR";
+    public static final String CASSANDRA_DATASOURCE = "WSO2BAM_CASSANDRA_DATASOURCE";
+
     public static final String AND = "AND";
     public static final String OR = "OR";
     public static final String FROM_CLAUSE = "fromClause";

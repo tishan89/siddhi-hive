@@ -2,8 +2,8 @@ package org.wso2.carbon.siddhihive.core;
 
 
 import org.wso2.carbon.siddhihive.core.headerprocessor.WindowStreamHandler;
-import org.wso2.carbon.siddhihive.querygenerator.HiveTableCreator;
-import org.wso2.carbon.siddhihive.selectorprocessor.QuerySelectorProcessor;
+import org.wso2.carbon.siddhihive.core.querygenerator.HiveTableCreator;
+import org.wso2.carbon.siddhihive.core.selectorprocessor.QuerySelectorProcessor;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.query.Query;
@@ -74,8 +74,9 @@ public class SiddhiHiveManager {
         StreamDefinition outStreamDefinition = getStreamDefinition(outStream.getStreamId());
 
         HiveTableCreator hiveTableCreator = new HiveTableCreator();
-        String outputQuery = hiveTableCreator.getQuery(outStreamDefinition);
+        hiveTableCreator.setQuery(outStreamDefinition);
 
+        String outputQuery = hiveTableCreator.getInsertQuery();
         //hiveQuery = outputQuery + "\n" +
 
 
