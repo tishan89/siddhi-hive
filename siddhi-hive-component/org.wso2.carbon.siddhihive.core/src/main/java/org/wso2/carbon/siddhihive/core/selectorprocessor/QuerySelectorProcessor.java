@@ -6,7 +6,7 @@ package org.wso2.carbon.siddhihive.core.selectorprocessor;
 
 import org.wso2.carbon.siddhihive.core.handler.AttributeHandler;
 import org.wso2.carbon.siddhihive.core.handler.ConditionHandler;
-import org.wso2.carbon.siddhihive.utils.Constants;
+import org.wso2.carbon.siddhihive.core.utils.Constants;
 import org.wso2.siddhi.query.api.condition.AndCondition;
 import org.wso2.siddhi.query.api.condition.Condition;
 import org.wso2.siddhi.query.api.condition.OrCondition;

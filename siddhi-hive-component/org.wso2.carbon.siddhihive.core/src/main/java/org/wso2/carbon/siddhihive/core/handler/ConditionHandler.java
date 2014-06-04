@@ -1,6 +1,6 @@
 package org.wso2.carbon.siddhihive.core.handler;
 
-import org.wso2.carbon.siddhihive.utils.Constants;
+import org.wso2.carbon.siddhihive.core.utils.Constants;
 import org.wso2.siddhi.query.api.condition.*;
 import org.wso2.siddhi.query.api.expression.Expression;
 import org.wso2.siddhi.query.api.expression.Multiply;

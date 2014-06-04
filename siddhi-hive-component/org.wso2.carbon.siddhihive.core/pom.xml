@@ -7,7 +7,7 @@
   </parent>
   <artifactId>org.wso2.carbon.siddhihive.core</artifactId>
   <packaging>bundle</packaging>
-  <name>server component</name>
+  <name>Siddhi-hive BE server component</name>
 <dependencies>
     <dependency>
         <groupId>org.wso2.siddhi</groupId>

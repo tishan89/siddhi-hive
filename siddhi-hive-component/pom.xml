@@ -11,7 +11,7 @@
   <artifactId>siddhi-hive-component</artifactId>
   <version>1.0.0</version>
   <packaging>pom</packaging>
-  <name>siddhi-hive-component</name>
+  <name>siddhi-hive Carbon Component</name>
   <description>siddhi-hive-component</description>
   <build>
     <plugins>

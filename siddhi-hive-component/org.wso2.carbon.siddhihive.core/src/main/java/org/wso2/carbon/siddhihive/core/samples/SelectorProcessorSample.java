@@ -1,6 +1,6 @@
 package org.wso2.carbon.siddhihive.core.samples;
 
-import org.wso2.carbon.siddhihive.SiddhiHiveManager;
+import org.wso2.carbon.siddhihive.core.SiddhiHiveManager;
 import org.wso2.carbon.siddhihive.core.selectorprocessor.QuerySelectorProcessor;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;

@@ -6,7 +6,7 @@
   <artifactId>siddhi-hive</artifactId>
   <version>1.0.0</version>
   <packaging>pom</packaging>
-  <name>siddhi-hive</name>
+  <name>Siddhi-Hive Carbon Module</name>
   <description>siddhi-hive</description>
   <build>
     <plugins>
