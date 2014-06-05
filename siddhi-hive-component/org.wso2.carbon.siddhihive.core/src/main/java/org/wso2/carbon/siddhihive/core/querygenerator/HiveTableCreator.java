@@ -10,12 +10,15 @@ import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
 public final class HiveTableCreator extends HiveQueryGenerator {
 	//**********************************************************************************************
-	private String sCreateQuery = "";
-	private String sInsertQuery = "";
+    private String sInsertQuery = "";
+    private String sHiveColumns = "";
+    private String sCSVQuery = "";
 	private String sCassandraQuery = "";
-	private String sColumns = "";
 	private String sCassandraProperties = "";
 	private String sCassandraColumns = "";
+    private String sSQLQuery = "";
+    private String sSQLProperties = "";
+    private String sSQLColumns = "";
 
 	String sDBName;
 	List<HiveField> listColumns;
@@ -34,7 +37,7 @@ public final class HiveTableCreator extends HiveQueryGenerator {
         Attribute attribute = null;
         for(int i = 0; i < attributeList.size(); i++) {
             attribute = attributeList.get(i);
-            listColumns.add(new HiveField(attribute.getName(), typeToString(attribute.getType())));
+            listColumns.add(new HiveField(attribute.getName(), siddhiToHiveType(attribute.getType())));
         }
 	}
 	
@@ -63,10 +66,10 @@ public final class HiveTableCreator extends HiveQueryGenerator {
 		
 		fillColumnString();
 		
-		sCreateQuery = ("CREATE TABLE IF NOT EXISTS " + sDBName + " (" + sColumns + ") " + 
+		sCSVQuery = ("CREATE TABLE IF NOT EXISTS " + sDBName + " (" + sHiveColumns + ") " +
 				"ROW FORMAT DELIMITED FIELDS TERMINATED BY ','" + " " +  "STORED AS SEQUENCEFILE" + ";");
 		
-		return sCreateQuery;
+		return sCSVQuery;
 	}
 	
 	//**********************************************************************************************
@@ -77,19 +80,34 @@ public final class HiveTableCreator extends HiveQueryGenerator {
 		fillColumnString();
 		fillCassandraProperties();
 		
-		sCassandraQuery = ("CREATE EXTERNAL TABLE IF NOT EXISTS " + sDBName + " (" + sColumns +
+		sCassandraQuery = ("CREATE EXTERNAL TABLE IF NOT EXISTS " + sDBName + " (" + sHiveColumns +
 				") STORED BY \'org.apache.hadoop.hive.cassandra.CassandraStorageHandler\' WITH SERDEPROPERTIES " +
 				"(" + sCassandraProperties +");");
 		
 		
 		return sCassandraQuery;
 	}
+
+    //**********************************************************************************************
+    public String getSQLTableCreateQuery() {
+        if (listColumns.size() <= 0)
+            return null;
+
+        fillColumnString();
+        fillSQLProperties();
+
+        sSQLQuery = ("CREATE EXTERNAL TABLE IF NOT EXISTS " + sDBName + " (" + sHiveColumns
+                +") STORED BY \'org.wso2.carbon.hadoop.hive.jdbc.storage.JDBCStorageHandler\' TBLPROPERTIES ("
+                +sSQLProperties+");");
+
+        return  sSQLQuery;
+    }
 	
 	//**********************************************************************************************
 	private void fillColumnString() {
-		sColumns = listColumns.get(0).getFieldName() + " " + listColumns.get(0).getDataType();
+		sHiveColumns = listColumns.get(0).getFieldName() + " " + listColumns.get(0).getDataType();
 		for (int i = 1; i < listColumns.size(); i++) {
-			sColumns += (", " + listColumns.get(i).getFieldName() + " " + listColumns.get(i).getDataType());
+			sHiveColumns += (", " + listColumns.get(i).getFieldName() + " " + listColumns.get(i).getDataType());
 		}
 	}
 	
@@ -108,4 +126,20 @@ public final class HiveTableCreator extends HiveQueryGenerator {
 			sCassandraColumns += (", payload_" + listColumns.get(i).getFieldName());
 		}
 	}
+
+    //**********************************************************************************************
+    private void fillSQLProperties() {
+        fillSQLColumnString();
+
+        sSQLProperties = ("\'wso2.carbon.datasource.name\' = \'"+Constants.CARBON_DATASOURCE+"\', "
+        +"\'hive.jdbc.table.create.query\' = \'CREATE TABLE "+sDBName+"_summary ("+sSQLColumns+")\'");
+    }
+
+    //**********************************************************************************************
+    private void fillSQLColumnString() {
+        sSQLColumns = (listColumns.get(0).getFieldName() + " " + hiveToSQLType(listColumns.get(0).getDataType()));
+        for (int i = 1; i < listColumns.size(); i++) {
+            sSQLColumns += (", " + listColumns.get(i).getFieldName() + " " + hiveToSQLType(listColumns.get(i).getDataType()));
+        }
+    }
 }
