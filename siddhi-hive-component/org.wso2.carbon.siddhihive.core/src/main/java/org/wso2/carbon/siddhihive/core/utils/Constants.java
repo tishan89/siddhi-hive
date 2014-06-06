@@ -14,6 +14,9 @@ public final class Constants {
     public static final String FROM = "from";
     public static final String WHERE = "where";
 
+    public static final String META = "meta";
+    public static final String CORRELATION = "correlation";
+
     //**********************************************************************************************
     public static final String H_STRING = "STRING";
     public static final String H_INT = "INT";
