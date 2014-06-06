@@ -12,14 +12,15 @@ public class TestQueryGenerator {
         // TODO Auto-generated method stub
         HiveTableCreator a = new HiveTableCreator();
         List<HiveField> map = new ArrayList<HiveField>();
-        map.add(new HiveField("col1", Constants.STRING));
-        map.add(new HiveField("col2", Constants.INT));
-        map.add(new HiveField("col3", Constants.DOUBLE));
-        map.add(new HiveField("col4", Constants.INT));
+        map.add(new HiveField("col1", Constants.H_STRING));
+        map.add(new HiveField("col2", Constants.H_INT));
+        map.add(new HiveField("col3", Constants.H_DOUBLE));
+        map.add(new HiveField("col4", Constants.H_INT));
         a.setQuery("mydb", map);
+        System.out.println(a.getInsertQuery());
         System.out.println(a.getCSVTableCreateQuery());
         System.out.println(a.getCassandraTableCreateQuery());
-        System.out.println(a.getInsertQuery());
+        System.out.println(a.getSQLTableCreateQuery());
         map.clear();
 	}
 }
