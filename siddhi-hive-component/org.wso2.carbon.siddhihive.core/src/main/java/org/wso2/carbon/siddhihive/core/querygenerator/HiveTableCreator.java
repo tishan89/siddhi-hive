@@ -27,12 +27,21 @@ public final class HiveTableCreator extends HiveQueryGenerator {
 	public HiveTableCreator() {
 		super();
     }
+
+    //**********************************************************************************************
+    public void setQuery(String sStreamID, String sResultTable, List<String> listFields) {
+        sDBName = sResultTable;
+        listColumns = new ArrayList<HiveField>();
+        for (int i=0; i < listFields.size(); i++) {
+            //get the datatype, create HiveField object and fill the list
+        }
+    }
 	
 	//**********************************************************************************************
-	public void setQuery(StreamDefinition streamDefinition) {
-		sDBName = streamDefinition.getStreamId();
-        List<Attribute> attributeList = streamDefinition.getAttributeList();
-        sDBName = streamDefinition.getStreamId();
+	public void setQuery(StreamDefinition outputStreamDef) {
+		sDBName = outputStreamDef.getStreamId();
+        List<Attribute> attributeList = outputStreamDef.getAttributeList();
+        sDBName = outputStreamDef.getStreamId();
         listColumns = new ArrayList<HiveField>();
         Attribute attribute = null;
         for(int i = 0; i < attributeList.size(); i++) {
