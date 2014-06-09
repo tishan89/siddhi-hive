@@ -1,7 +1,8 @@
 package org.wso2.carbon.siddhihive.core.headerprocessor;
 
 
-//import org.wso2.carbon.siddhihive.handler.ConditionHandler;
+import org.wso2.carbon.siddhihive.core.handler.ConditionHandler;
+import org.wso2.carbon.siddhihive.core.configurations.StreamDefinition;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
 import org.wso2.siddhi.query.api.query.input.BasicStream;
 import org.wso2.siddhi.query.api.query.input.Stream;
@@ -18,7 +19,7 @@ public class BasicStreamHandler implements StreamHandler {
     private Map<String, String> result;
 
     @Override
-    public Map<String, String> process(Stream stream, Map<String, org.wso2.carbon.siddhihive.core.configurations.StreamDefinition> streamDefinitions) {
+    public Map<String, String> process(Stream stream, Map<String, StreamDefinition> streamDefinitions) {
         basicStream = (BasicStream) stream;
         fromClause = generateFromClause(basicStream.getStreamId());
         whereClause = generateWhereClause(basicStream.getFilter());
@@ -35,9 +36,9 @@ public class BasicStreamHandler implements StreamHandler {
 
     public String generateWhereClause(Filter filter) {
         if (filter != null) {
-           // ConditionHandler conditionHandler = new ConditionHandler();
-            //String filterStr = conditionHandler.processCondition(filter.getFilterCondition());
-            return ""/*Constants.WHERE + " " + filterStr*/;
+            ConditionHandler conditionHandler = new ConditionHandler();
+            String filterStr = conditionHandler.processCondition(filter.getFilterCondition());
+            return Constants.WHERE + " " + filterStr;
         } else {
             return "";
         }
