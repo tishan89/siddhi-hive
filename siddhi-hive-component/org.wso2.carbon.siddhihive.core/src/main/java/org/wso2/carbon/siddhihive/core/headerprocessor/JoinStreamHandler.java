@@ -15,7 +15,7 @@ public class JoinStreamHandler implements StreamHandler {
 
 
     @Override
-    public Map<String, String> process(Stream stream) {
+    public Map<String, String> process(Stream stream, Map<String, org.wso2.carbon.siddhihive.core.configurations.StreamDefinition> streamDefinitions) {
         return null;
     }
 }

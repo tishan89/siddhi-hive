@@ -1,8 +1,8 @@
 package org.wso2.carbon.siddhihive.core.headerprocessor;
 
 
+import org.wso2.carbon.siddhihive.core.configurations.StreamDefinition;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
-import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.expression.constant.IntConstant;
 import org.wso2.siddhi.query.api.query.input.handler.Window;
 
@@ -30,9 +30,10 @@ public class WindowIsolator {
         return isolatorClause;
     }
 
-    private String generateIsolateClause(StreamDefinition streamDefinition) {//Added this method for future configurations
+    private String generateIsolateClause(org.wso2.carbon.siddhihive.core.configurations.StreamDefinition streamDefinition) {//Added this method for future configurations
         int bufferTime = 0;
-        return getIncrementalClause(streamDefinition.getStreamId(), streamDefinition.getStreamId(), true, bufferTime);
+        String name = streamDefinition.getStreamDefinition().getStreamId() + System.currentTimeMillis();
+        return getIncrementalClause(name, streamDefinition.getStreamDefinition().getStreamId(), true, bufferTime);
     }
 
     public String getIncrementalClause(String name, String table, Boolean dataindexing, int bufferTime) {

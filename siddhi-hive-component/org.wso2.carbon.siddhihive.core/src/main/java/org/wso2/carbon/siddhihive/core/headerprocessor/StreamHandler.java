@@ -7,5 +7,5 @@ import java.util.Map;
 
 public interface StreamHandler {
 
-    public Map<String, String> process(Stream stream);
+    public Map<String, String> process(Stream stream, Map<String, org.wso2.carbon.siddhihive.core.configurations.StreamDefinition> streamDefinitions);
 }

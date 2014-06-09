@@ -18,7 +18,7 @@ public class BasicStreamHandler implements StreamHandler {
     private Map<String, String> result;
 
     @Override
-    public Map<String, String> process(Stream stream) {
+    public Map<String, String> process(Stream stream, Map<String, org.wso2.carbon.siddhihive.core.configurations.StreamDefinition> streamDefinitions) {
         basicStream = (BasicStream) stream;
         fromClause = generateFromClause(basicStream.getStreamId());
         whereClause = generateWhereClause(basicStream.getFilter());
