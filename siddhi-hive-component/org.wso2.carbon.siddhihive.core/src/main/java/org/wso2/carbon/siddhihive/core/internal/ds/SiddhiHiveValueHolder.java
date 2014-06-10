@@ -1,11 +1,12 @@
 package org.wso2.carbon.siddhihive.core.internal.ds;
 
 
-import org.wso2.carbon.event.stream.manager.core.EventStreamService;
+//import org.wso2.carbon.event.stream.manager.core.EventStreamService;
+
 import org.wso2.carbon.siddhihive.core.internal.SiddhiHiveService;
 
 public class SiddhiHiveValueHolder {
-    private EventStreamService eventStreamService;
+    //private EventStreamService eventStreamService;
     private static SiddhiHiveValueHolder siddhiHiveValueHolder;
     private SiddhiHiveService siddhiHiveService;
 
@@ -20,7 +21,7 @@ public class SiddhiHiveValueHolder {
         return siddhiHiveValueHolder;
     }
 
-    public EventStreamService getEventStreamService() {
+    /*public EventStreamService getEventStreamService() {
         return eventStreamService;
     }
 
@@ -30,7 +31,7 @@ public class SiddhiHiveValueHolder {
 
     public void unsetEventStreamService() {
         this.eventStreamService = null;
-    }
+    }*/
 
     public void registerSiddhiHiveService(SiddhiHiveService siddhiHiveService) {
         this.siddhiHiveService = siddhiHiveService;
