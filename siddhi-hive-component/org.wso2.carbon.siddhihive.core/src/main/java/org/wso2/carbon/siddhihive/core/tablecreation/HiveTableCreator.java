@@ -9,7 +9,7 @@ import org.wso2.carbon.siddhihive.core.utils.Constants;
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
-public final class HiveTableCreator extends HiveTableCreaterBase {
+public final class HiveTableCreator extends HiveTableCreatorBase {
 	//**********************************************************************************************
     private String sInsertQuery = "";
     private String sHiveColumns = "";

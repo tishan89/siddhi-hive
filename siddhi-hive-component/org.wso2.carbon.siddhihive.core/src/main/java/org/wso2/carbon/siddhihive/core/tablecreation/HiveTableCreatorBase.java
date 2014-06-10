@@ -3,10 +3,10 @@ package org.wso2.carbon.siddhihive.core.tablecreation;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
-public abstract class HiveTableCreaterBase {
+public abstract class HiveTableCreatorBase {
 	
 	//**********************************************************************************************
-	public HiveTableCreaterBase() {
+	public HiveTableCreatorBase() {
 		
 	}
 	
