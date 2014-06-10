@@ -1,10 +1,7 @@
 package org.wso2.carbon.siddhihive.core;
 
-import org.wso2.carbon.event.processor.core.ExecutionPlanConfiguration;
-import org.wso2.carbon.siddhihive.core.configurations.ExecutionPlan;
-import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
-import java.util.Map;
+import org.wso2.carbon.siddhihive.core.configurations.ExecutionPlan;
 
 /**
  * This is the Siddhi-HiveServiceInterface to access Siddhi-HiveService functinalites from service consumer.
