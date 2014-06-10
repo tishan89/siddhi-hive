@@ -2,6 +2,7 @@ package org.wso2.carbon.siddhihive.core.internal;
 
 
 import org.apache.log4j.Logger;
+import org.wso2.carbon.siddhihive.core.configurations.StreamDefinitionExt;
 import org.wso2.carbon.siddhihive.core.headerprocessor.HeaderHandler;
 import org.wso2.carbon.siddhihive.core.tablecreation.CSVTableCreator;
 import org.wso2.carbon.siddhihive.core.selectorprocessor.QuerySelectorProcessor;
@@ -22,45 +23,45 @@ public class SiddhiHiveManager {
 
 
     private static final Logger log = Logger.getLogger(SiddhiHiveManager.class);
-    private ConcurrentMap<String, org.wso2.carbon.siddhihive.core.configurations.StreamDefinition> streamDefinitionMap; //contains stream definition
+    private ConcurrentMap<String, StreamDefinitionExt> streamDefinitionMap; //contains stream definition
     private ConcurrentMap<String, String> queryMap;
 
     public SiddhiHiveManager() {
-        streamDefinitionMap = new ConcurrentHashMap<String, org.wso2.carbon.siddhihive.core.configurations.StreamDefinition>();
+        streamDefinitionMap = new ConcurrentHashMap<String, StreamDefinitionExt>();
         //New Query Map
         queryMap = new ConcurrentHashMap<String, String>();
     }
 
-    public ConcurrentMap<String, org.wso2.carbon.siddhihive.core.configurations.StreamDefinition> getStreamDefinitionMap() {
+    public ConcurrentMap<String, StreamDefinitionExt> getStreamDefinitionMap() {
         return streamDefinitionMap;
     }
 
-    public void setStreamDefinitionMap(ConcurrentMap<String, org.wso2.carbon.siddhihive.core.configurations.StreamDefinition> streamDefinitionMap) {
+    public void setStreamDefinitionMap(ConcurrentMap<String, StreamDefinitionExt> streamDefinitionMap) {
         this.streamDefinitionMap = streamDefinitionMap;
     }
 
-    public void setStreamDefinition(String streamDefinitionID, org.wso2.carbon.siddhihive.core.configurations.StreamDefinition streamDefinition) {
+    public void setStreamDefinition(String streamDefinitionID, StreamDefinitionExt streamDefinition) {
         streamDefinitionMap.put(streamDefinitionID, streamDefinition);
     }
 
-    public void setStreamDefinition(List<org.wso2.carbon.siddhihive.core.configurations.StreamDefinition> streamDefinitionList) {
-        for (org.wso2.carbon.siddhihive.core.configurations.StreamDefinition definition : streamDefinitionList) {
+    public void setStreamDefinition(List<StreamDefinitionExt> streamDefinitionList) {
+        for (StreamDefinitionExt definition : streamDefinitionList) {
             streamDefinitionMap.put(definition.getStreamDefinition().getStreamId(), definition);
         }
     }
 
     public void setSiddhiStreamDefinition(List<StreamDefinition> streamDefinitionList) {
         for (StreamDefinition definition : streamDefinitionList) {
-            for (Map.Entry<String, org.wso2.carbon.siddhihive.core.configurations.StreamDefinition> entry : streamDefinitionMap.entrySet()) {
+            for (Map.Entry<String, StreamDefinitionExt> entry : streamDefinitionMap.entrySet()) {
                 if (!(definition.getStreamId().equals(entry.getKey()))) {
-                    org.wso2.carbon.siddhihive.core.configurations.StreamDefinition streamDefinition = new org.wso2.carbon.siddhihive.core.configurations.StreamDefinition(definition.getStreamId(), definition);
+                    StreamDefinitionExt streamDefinition = new StreamDefinitionExt(definition.getStreamId(), definition);
                     this.setStreamDefinition(streamDefinition.getFullQualifiedStreamID(), streamDefinition);
                 }
             }
         }
     }
 
-    public org.wso2.carbon.siddhihive.core.configurations.StreamDefinition getStreamDefinition(String streamId) {
+    public StreamDefinitionExt getStreamDefinition(String streamId) {
         return streamDefinitionMap.get(streamId);
     }
 
@@ -77,7 +78,7 @@ public class SiddhiHiveManager {
         ConcurrentMap<String, String> concurrentSelectorMap = querySelectorProcessor.getSelectorQueryMap();
 
         OutStream outStream = query.getOutputStream();
-        org.wso2.carbon.siddhihive.core.configurations.StreamDefinition outStreamDefinition = getStreamDefinition(outStream.getStreamId());
+        StreamDefinitionExt outStreamDefinition = getStreamDefinition(outStream.getStreamId());
 
         CSVTableCreator CSVTableCreator = new CSVTableCreator();
         //CSVTableCreator.setQuery(outStreamDefinition);

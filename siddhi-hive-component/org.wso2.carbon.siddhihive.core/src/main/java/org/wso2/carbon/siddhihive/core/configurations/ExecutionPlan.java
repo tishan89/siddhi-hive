@@ -7,7 +7,7 @@ public class ExecutionPlan {
     private String query;
     private Map<String, StreamDefinitionExt> streamDefinitionMap;
 
-    public ExecutionPlan(String query, Map<String, StreamDefinition> streamDefinitionMap) {
+    public ExecutionPlan(String query, Map<String, StreamDefinitionExt> streamDefinitionMap) {
         this.query = query;
         this.streamDefinitionMap = streamDefinitionMap;
     }
