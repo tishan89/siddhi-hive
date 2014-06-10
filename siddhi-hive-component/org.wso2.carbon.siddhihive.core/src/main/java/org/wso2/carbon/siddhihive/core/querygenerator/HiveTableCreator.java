@@ -4,6 +4,7 @@ package org.wso2.carbon.siddhihive.core.querygenerator;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.wso2.carbon.siddhihive.core.configurations.StreamDefinitionExt;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
@@ -21,6 +22,7 @@ public final class HiveTableCreator extends HiveQueryGenerator {
     private String sSQLColumns = "";
 
 	String sDBName;
+    String sFullStreamID;
 	List<HiveField> listColumns;
 	
 	//**********************************************************************************************
@@ -28,20 +30,13 @@ public final class HiveTableCreator extends HiveQueryGenerator {
 		super();
     }
 
-    //**********************************************************************************************
-    public void setQuery(String sStreamID, String sResultTable, List<String> listFields) {
-        sDBName = sResultTable;
-        listColumns = new ArrayList<HiveField>();
-        for (int i=0; i < listFields.size(); i++) {
-            //get the datatype, create HiveField object and fill the list
-        }
-    }
-	
 	//**********************************************************************************************
-	public void setQuery(StreamDefinition outputStreamDef) {
-		sDBName = outputStreamDef.getStreamId();
-        List<Attribute> attributeList = outputStreamDef.getAttributeList();
-        sDBName = outputStreamDef.getStreamId();
+	public void setQuery(StreamDefinitionExt outputStreamDef) {
+        sFullStreamID = outputStreamDef.getFullQualifiedStreamID();
+        StreamDefinition def = outputStreamDef.getStreamDefinition();
+		sDBName = def.getStreamId();
+        List<Attribute> attributeList = def.getAttributeList();
+        sDBName = def.getStreamId();
         listColumns = new ArrayList<HiveField>();
         Attribute attribute = null;
         for(int i = 0; i < attributeList.size(); i++) {
@@ -51,9 +46,10 @@ public final class HiveTableCreator extends HiveQueryGenerator {
 	}
 	
 	//**********************************************************************************************
-	public void setQuery(String sDB, List<HiveField> listFields) {
+	public void setQuery(String sDB, List<HiveField> listFields, String sFullQualifiedStreamID) {
 		sDBName = sDB;
 		listColumns = listFields;
+        sFullStreamID = sFullQualifiedStreamID;
 	}
 	
 	//**********************************************************************************************
@@ -125,7 +121,8 @@ public final class HiveTableCreator extends HiveQueryGenerator {
 		fillCassandraColumnString();
 		
 		sCassandraProperties = ("\"wso2.carbon.datasource.name\" = \""+Constants.CASSANDRA_DATASOURCE+"\", "
-				+"\"cassandra.columns.mapping\" = \""+sCassandraColumns+"\"");
+				+ "\"cassandra.cf.name\" = \""+sFullStreamID.replaceAll(".", "_")+"\", "
+                + "\"cassandra.columns.mapping\" = \""+sCassandraColumns+"\"");
 	}
 	
 	//**********************************************************************************************
@@ -141,7 +138,7 @@ public final class HiveTableCreator extends HiveQueryGenerator {
         fillSQLColumnString();
 
         sSQLProperties = ("\'wso2.carbon.datasource.name\' = \'"+Constants.CARBON_DATASOURCE+"\', "
-        +"\'hive.jdbc.table.create.query\' = \'CREATE TABLE "+sDBName+"_summary ("+sSQLColumns+")\'");
+                +"\'hive.jdbc.table.create.query\' = \'CREATE TABLE "+sDBName+"_summary ("+sSQLColumns+")\'");
     }
 
     //**********************************************************************************************

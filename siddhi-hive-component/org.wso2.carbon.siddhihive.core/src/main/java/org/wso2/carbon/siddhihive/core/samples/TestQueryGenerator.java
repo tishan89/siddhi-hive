@@ -16,7 +16,7 @@ public class TestQueryGenerator {
         map.add(new HiveField("col2", Constants.H_INT));
         map.add(new HiveField("col3", Constants.H_DOUBLE));
         map.add(new HiveField("col4", Constants.H_INT));
-        a.setQuery("mydb", map);
+        a.setQuery("mydb", map, "wso2.org.carbon.hive.mydb");
         System.out.println(a.getInsertQuery());
         System.out.println(a.getCSVTableCreateQuery());
         System.out.println(a.getCassandraTableCreateQuery());
