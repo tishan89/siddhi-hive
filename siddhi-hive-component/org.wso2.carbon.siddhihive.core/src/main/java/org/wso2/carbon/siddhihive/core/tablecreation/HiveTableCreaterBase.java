@@ -1,13 +1,12 @@
-package org.wso2.carbon.siddhihive.core.querygenerator;
+package org.wso2.carbon.siddhihive.core.tablecreation;
 
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
 import org.wso2.siddhi.query.api.definition.Attribute;
 
-public abstract class HiveQueryGenerator {
+public abstract class HiveTableCreaterBase {
 	
 	//**********************************************************************************************
-	public HiveQueryGenerator () {
+	public HiveTableCreaterBase() {
 		
 	}
 	

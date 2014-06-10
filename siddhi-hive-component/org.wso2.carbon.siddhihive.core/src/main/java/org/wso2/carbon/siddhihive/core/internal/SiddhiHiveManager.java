@@ -3,8 +3,7 @@ package org.wso2.carbon.siddhihive.core.internal;
 
 import org.apache.log4j.Logger;
 import org.wso2.carbon.siddhihive.core.headerprocessor.HeaderHandler;
-import org.wso2.carbon.siddhihive.core.internal.ds.SiddhiHiveValueHolder;
-import org.wso2.carbon.siddhihive.core.querygenerator.HiveTableCreator;
+import org.wso2.carbon.siddhihive.core.tablecreation.HiveTableCreator;
 import org.wso2.carbon.siddhihive.core.selectorprocessor.QuerySelectorProcessor;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;

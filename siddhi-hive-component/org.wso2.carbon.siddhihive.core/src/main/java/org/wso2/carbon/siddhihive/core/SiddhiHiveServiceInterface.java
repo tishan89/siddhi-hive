@@ -14,5 +14,5 @@ public interface SiddhiHiveServiceInterface {
      * @return : Generated Hive query
      */
     public String addExecutionPlan(ExecutionPlan executionPlan);
-//public Boolean addStreamDefinition(StreamDefinition streamDefinition, String fullQualifiedName);
+//public Boolean addStreamDefinition(StreamDefinitionExt streamDefinition, String fullQualifiedName);
 }

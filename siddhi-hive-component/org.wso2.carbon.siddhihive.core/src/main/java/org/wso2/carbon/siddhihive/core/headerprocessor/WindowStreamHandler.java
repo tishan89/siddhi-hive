@@ -1,7 +1,7 @@
 package org.wso2.carbon.siddhihive.core.headerprocessor;
 
 
-import org.wso2.carbon.siddhihive.core.configurations.StreamDefinition;
+import org.wso2.carbon.siddhihive.core.configurations.StreamDefinitionExt;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
 import org.wso2.siddhi.query.api.query.input.Stream;
 import org.wso2.siddhi.query.api.query.input.WindowStream;
@@ -24,7 +24,7 @@ public class WindowStreamHandler extends BasicStreamHandler {
     }
 
     @Override
-    public Map<String, String> process(Stream stream, Map<String, StreamDefinition> streamDefinitions) {
+    public Map<String, String> process(Stream stream, Map<String, StreamDefinitionExt> streamDefinitions) {
         this.windowStream = (WindowStream) stream;
         windowIsolatorClause = generateIsolatorClause(windowStream.getStreamId(), windowStream.getWindow(), streamDefinitions);
         fromClause = generateFromClause(windowStream.getStreamId());
@@ -36,9 +36,9 @@ public class WindowStreamHandler extends BasicStreamHandler {
         return result;
     }
 
-    private String generateIsolatorClause(String streamId, Window window, Map<String, StreamDefinition> streamDefinitions) {
-        StreamDefinition streamDefinition = streamDefinitions.get(streamId);
-        return windowIsolator.process(windowStream.getWindow(), streamDefinition);
+    private String generateIsolatorClause(String streamId, Window window, Map<String, StreamDefinitionExt> streamDefinitions) {
+        StreamDefinitionExt streamDefinitionExt = streamDefinitions.get(streamId);
+        return windowIsolator.process(windowStream.getWindow(), streamDefinitionExt);
     }
 
 }

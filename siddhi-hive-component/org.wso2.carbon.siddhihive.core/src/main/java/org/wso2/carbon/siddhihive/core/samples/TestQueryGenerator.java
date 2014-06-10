@@ -3,7 +3,7 @@ package org.wso2.carbon.siddhihive.core.samples;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.wso2.carbon.siddhihive.core.querygenerator.*;
+import org.wso2.carbon.siddhihive.core.tablecreation.*;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
 
 public class TestQueryGenerator {

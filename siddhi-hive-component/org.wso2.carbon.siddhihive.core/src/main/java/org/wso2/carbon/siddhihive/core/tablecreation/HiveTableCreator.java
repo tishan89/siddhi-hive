@@ -1,4 +1,4 @@
-package org.wso2.carbon.siddhihive.core.querygenerator;
+package org.wso2.carbon.siddhihive.core.tablecreation;
 
 
 import java.util.ArrayList;
@@ -9,7 +9,7 @@ import org.wso2.carbon.siddhihive.core.utils.Constants;
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
-public final class HiveTableCreator extends HiveQueryGenerator {
+public final class HiveTableCreator extends HiveTableCreaterBase {
 	//**********************************************************************************************
     private String sInsertQuery = "";
     private String sHiveColumns = "";

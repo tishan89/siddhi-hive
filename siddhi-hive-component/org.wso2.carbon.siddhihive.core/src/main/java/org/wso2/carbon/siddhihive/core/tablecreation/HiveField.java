@@ -1,4 +1,4 @@
-package org.wso2.carbon.siddhihive.core.querygenerator;
+package org.wso2.carbon.siddhihive.core.tablecreation;
 
 public final class HiveField {
 	//**********************************************************************************************
