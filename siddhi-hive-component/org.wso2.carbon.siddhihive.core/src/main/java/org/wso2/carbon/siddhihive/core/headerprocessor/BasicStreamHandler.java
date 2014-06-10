@@ -2,7 +2,7 @@ package org.wso2.carbon.siddhihive.core.headerprocessor;
 
 
 import org.wso2.carbon.siddhihive.core.handler.ConditionHandler;
-import org.wso2.carbon.siddhihive.core.configurations.StreamDefinition;
+import org.wso2.carbon.siddhihive.core.configurations.StreamDefinitionExt;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
 import org.wso2.siddhi.query.api.query.input.BasicStream;
 import org.wso2.siddhi.query.api.query.input.Stream;
@@ -19,7 +19,7 @@ public class BasicStreamHandler implements StreamHandler {
     private Map<String, String> result;
 
     @Override
-    public Map<String, String> process(Stream stream, Map<String, StreamDefinition> streamDefinitions) {
+    public Map<String, String> process(Stream stream, Map<String, StreamDefinitionExt> streamDefinitions) {
         basicStream = (BasicStream) stream;
         fromClause = generateFromClause(basicStream.getStreamId());
         whereClause = generateWhereClause(basicStream.getFilter());

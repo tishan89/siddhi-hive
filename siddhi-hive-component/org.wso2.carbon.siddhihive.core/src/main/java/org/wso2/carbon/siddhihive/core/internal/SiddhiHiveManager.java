@@ -3,8 +3,7 @@ package org.wso2.carbon.siddhihive.core.internal;
 
 import org.apache.log4j.Logger;
 import org.wso2.carbon.siddhihive.core.headerprocessor.HeaderHandler;
-import org.wso2.carbon.siddhihive.core.internal.ds.SiddhiHiveValueHolder;
-import org.wso2.carbon.siddhihive.core.querygenerator.HiveTableCreator;
+import org.wso2.carbon.siddhihive.core.tablecreation.CSVTableCreator;
 import org.wso2.carbon.siddhihive.core.selectorprocessor.QuerySelectorProcessor;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
@@ -80,10 +79,10 @@ public class SiddhiHiveManager {
         OutStream outStream = query.getOutputStream();
         org.wso2.carbon.siddhihive.core.configurations.StreamDefinition outStreamDefinition = getStreamDefinition(outStream.getStreamId());
 
-        HiveTableCreator hiveTableCreator = new HiveTableCreator();
-        //hiveTableCreator.setQuery(outStreamDefinition);
+        CSVTableCreator CSVTableCreator = new CSVTableCreator();
+        //CSVTableCreator.setQuery(outStreamDefinition);
 
-        String outputQuery = hiveTableCreator.getInsertQuery();
+        String outputQuery = CSVTableCreator.getInsertQuery();
         //hiveQuery = outputQuery + "\n" +
 
 

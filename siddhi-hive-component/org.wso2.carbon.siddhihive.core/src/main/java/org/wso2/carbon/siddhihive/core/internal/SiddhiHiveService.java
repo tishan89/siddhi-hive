@@ -2,7 +2,7 @@ package org.wso2.carbon.siddhihive.core.internal;
 
 
 import org.wso2.carbon.siddhihive.core.configurations.ExecutionPlan;
-import org.wso2.carbon.siddhihive.core.configurations.StreamDefinition;
+import org.wso2.carbon.siddhihive.core.configurations.StreamDefinitionExt;
 import org.wso2.carbon.siddhihive.core.SiddhiHiveServiceInterface;
 import org.wso2.siddhi.core.SiddhiManager;
 
@@ -15,7 +15,7 @@ public class SiddhiHiveService implements SiddhiHiveServiceInterface {
     @Override
     public String addExecutionPlan(ExecutionPlan executionPlan) {
         siddhiHiveManager = new SiddhiHiveManager();
-        siddhiHiveManager.setStreamDefinitionMap((java.util.concurrent.ConcurrentMap<String, StreamDefinition>) executionPlan.getStreamDefinitionMap());
+        siddhiHiveManager.setStreamDefinitionMap((java.util.concurrent.ConcurrentMap<String, StreamDefinitionExt>) executionPlan.getStreamDefinitionMap());
         configureSiddhiManager(executionPlan.getStreamDefinitionMap());
         String queryID = siddhiManager.addQuery(executionPlan.getQuery());
         siddhiHiveManager.setSiddhiStreamDefinition(siddhiManager.getStreamDefinitions());
@@ -23,16 +23,16 @@ public class SiddhiHiveService implements SiddhiHiveServiceInterface {
         return hiveQueryString;
     }
 
-    private void configureSiddhiManager(Map<String, StreamDefinition> streamDefinitions) {
+    private void configureSiddhiManager(Map<String, StreamDefinitionExt> streamDefinitions) {
         siddhiManager = new SiddhiManager();
-        for (Map.Entry<String, StreamDefinition> entry : streamDefinitions.entrySet()) {
+        for (Map.Entry<String, StreamDefinitionExt> entry : streamDefinitions.entrySet()) {
             siddhiManager.defineStream(entry.getValue().getStreamDefinition());
 
         }
     }
 
     /*@Override
-    public Boolean addStreamDefinition(StreamDefinition streamDefinition, String fullQualifiedname) {
+    public Boolean addStreamDefinition(StreamDefinitionExt streamDefinition, String fullQualifiedname) {
         return null;
     }*/
 }

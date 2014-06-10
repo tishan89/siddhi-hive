@@ -1,11 +1,11 @@
 package org.wso2.carbon.siddhihive.core.configurations;
 
 
-public class StreamDefinition {
+public class StreamDefinitionExt {
     private String fullQualifiedStreamID;
     private org.wso2.siddhi.query.api.definition.StreamDefinition streamDefinition;
 
-    public StreamDefinition(String streamId, org.wso2.siddhi.query.api.definition.StreamDefinition definition) {
+    public StreamDefinitionExt(String streamId, org.wso2.siddhi.query.api.definition.StreamDefinition definition) {
         this.fullQualifiedStreamID = streamId;
         this.streamDefinition = definition;
     }
