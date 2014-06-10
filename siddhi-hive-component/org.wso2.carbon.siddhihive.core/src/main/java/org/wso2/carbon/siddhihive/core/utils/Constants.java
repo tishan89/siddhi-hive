@@ -49,4 +49,6 @@ public final class Constants {
     public static final String HAVING_QUERY = "havingQuery";
 
     public static final String DEFAULT_SLIDING_FREQUENCY = "600";
+    public static final String LENGTH_WINDOW = "length";
+    public static final String LENGTH_BATCH_WINDOW = "lengthBatch";
 }
