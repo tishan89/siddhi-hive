@@ -49,7 +49,7 @@ public class TimeWindowStreamHandler extends WindowStreamHandler {
     }
 
     private String generateIsolatorClause(String streamId, Window window, Map<String, StreamDefinitionExt> streamDefinitions) {
-        StreamDefinitionExt streamDefinition = streamDefinitions.get(streamId);
-        return windowIsolator.process(windowStream.getWindow(), streamDefinition);
+        StreamDefinitionExt streamDefinitionExt = streamDefinitions.get(streamId);
+        return windowIsolator.process(windowStream.getWindow(), streamDefinitionExt);
     }
 }

@@ -1,11 +1,14 @@
 package org.wso2.carbon.siddhihive.core.samples;
 
-import org.wso2.carbon.siddhihive.core.SiddhiHiveManager;
+import org.wso2.carbon.siddhihive.core.configurations.StreamDefinitionExt;
+import org.wso2.carbon.siddhihive.core.internal.SiddhiHiveManager;
 import org.wso2.carbon.siddhihive.core.selectorprocessor.QuerySelectorProcessor;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.query.Query;
 
+import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -53,14 +56,21 @@ public class SelectorProcessorSample {
 
 
         List<StreamDefinition> streamDefinitionList = siddhiManager.getStreamDefinitions();
+        List<StreamDefinitionExt> streamDefinitionExtList = new ArrayList<StreamDefinitionExt>() ;
 
-        SiddhiHiveManager siddhiHiveManager = SiddhiHiveManager.getInstance();
+        SiddhiHiveManager siddhiHiveManager = new SiddhiHiveManager();
+
 
         for (int i = 0; i < streamDefinitionList.size(); ++i) {
 
             StreamDefinition streamDefinition = streamDefinitionList.get(i);
-            siddhiHiveManager.setStreamDefinition(streamDefinition.getStreamId(), streamDefinition);
+            StreamDefinitionExt streamDefinitionExt = new StreamDefinitionExt(streamDefinition.getStreamId(), streamDefinition);
+
+            streamDefinitionExtList.add(streamDefinitionExt);
+           // siddhiHiveManager.setStreamDefinition(streamDefinition.getStreamId(), streamDefinition);
         }
+
+        siddhiHiveManager.setStreamDefinition(streamDefinitionExtList);
 
         String hiveQuery = siddhiHiveManager.getQuery(query);
         System.out.println(hiveQuery);
