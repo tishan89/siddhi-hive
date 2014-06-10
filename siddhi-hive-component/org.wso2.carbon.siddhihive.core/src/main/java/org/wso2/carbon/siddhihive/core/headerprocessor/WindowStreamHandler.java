@@ -20,7 +20,8 @@ public class WindowStreamHandler extends BasicStreamHandler {
             TimeWindowStreamHandler timeWindowStreamHandler = new TimeWindowStreamHandler();
             return timeWindowStreamHandler.process(windowStream, streamDefinitions);
         } else if (type.equals(Constants.LENGTH_WINDOW) || type.equals(Constants.LENGTH_BATCH_WINDOW)) {
-            return null; //TODO
+            LengthWindowStreamHandler lengthWindowStreamHandler = new LengthWindowStreamHandler();
+            return lengthWindowStreamHandler.process(windowStream, streamDefinitions);
         }
         return null;
     }

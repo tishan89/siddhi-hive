@@ -88,64 +88,35 @@ public class SiddhiHiveManager {
 
 
         String fromClause = headerMap.get(Constants.FROM_CLAUSE);
+
+        if(fromClause == null)
+            fromClause = headerMap.get(Constants.LENGTH_WIND_FROM_QUERY);
+
         String selectQuery = "SELECT " + concurrentSelectorMap.get(Constants.SELECTION_QUERY);
         String groupByQuery = concurrentSelectorMap.get(Constants.GROUP_BY_QUERY);
+
+        if(groupByQuery == null)
+            groupByQuery = " ";
+
         String havingQuery = concurrentSelectorMap.get(Constants.HAVING_QUERY);
 
+        if(havingQuery == null)
+            havingQuery = " ";
+
         String whereClause = headerMap.get(Constants.WHERE_CLAUSE);
+
+        if(whereClause == null)
+            whereClause = " ";
+
         String incrementalClause = headerMap.get(Constants.INCREMENTAL_CLAUSE);
 
-        hiveQuery = outputQuery + "\n" + incrementalClause + "\n" + fromClause + "\n " + selectQuery + "\n " + groupByQuery + "\n " + havingQuery + "\n " + whereClause + "\n ";
+        if(incrementalClause == null)
+            incrementalClause = " ";
+
+       // hiveQuery = outputQuery + "\n" + incrementalClause + "\n" + fromClause + "\n " + selectQuery + "\n " + groupByQuery + "\n " + havingQuery + "\n " + whereClause + "\n ";
+        hiveQuery = outputQuery + "\n" + incrementalClause + "\n" + selectQuery + "\n " + fromClause + "\n " +whereClause + "\n " + groupByQuery + "\n " + havingQuery + "\n ";
 
         return hiveQuery;
 
     }
-
-
-//    public String getHiveQuery(Query query){
-//
-//        if(query == null)
-//            return null;
-//
-//        String hiveQuery = "";
-//
-//
-//
-//        WindowStreamHandler windowStreamHandler = new WindowStreamHandler();
-//        HashMap<String, String> windowStreamMap = windowStreamHandler.process()
-//
-//
-//
-//    }
-//
-//    private String handleStream(Stream stream){
-//
-//        String resultQuery = "";
-//
-//        if(stream instanceof WindowStream){
-//
-//        }
-//
-////        if(stream instanceof BasicStream){
-////
-////        }
-////        else if(stream instanceof JoinStream){
-////
-////            JoinStream joinStream = (JoinStream) stream;
-////
-////            String leftStream = handleStream(joinStream.getLeftStream());
-////            String rightStream = handleStream(joinStream.getRightStream());
-////        }
-////        else if(stream instanceof WindowStream){
-////
-////        }
-//
-//    }
-
-//    private Stream handleJoinStream(JoinStream joinStream){
-//
-//
-//    }
-
-
 }

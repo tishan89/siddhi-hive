@@ -46,7 +46,7 @@ public class SelectorProcessorSample {
 //                "insert into FastMovingStockQuotes;
 
         System.out.println("+++++++++++++++++++++++++++");
-        String queryID = siddhiManager.addQuery(" from StockExchangeStream[symbol == \"IBM\"]#window.time(6000)\n" +
+        String queryID = siddhiManager.addQuery(" from StockExchangeStream[symbol == \"IBM\"]#window.length(6000)\n" +
                 "select symbol,price, avg(price) as averagePrice \n" +
                 "group by symbol, price\n" +
                 "having ((price > averagePrice*1.02) and ( (averagePrice*0.98 > price) or (averagePrice*0.98 < price) ))\n" +
