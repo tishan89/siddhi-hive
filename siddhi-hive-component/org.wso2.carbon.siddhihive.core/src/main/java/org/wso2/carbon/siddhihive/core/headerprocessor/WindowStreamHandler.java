@@ -1,7 +1,7 @@
 package org.wso2.carbon.siddhihive.core.headerprocessor;
 
 
-import org.wso2.carbon.siddhihive.core.configurations.StreamDefinition;
+import org.wso2.carbon.siddhihive.core.configurations.StreamDefinitionExt;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
 import org.wso2.siddhi.query.api.query.input.Stream;
 import org.wso2.siddhi.query.api.query.input.WindowStream;
@@ -13,7 +13,7 @@ public class WindowStreamHandler extends BasicStreamHandler {
     private Object type;
 
     @Override
-    public Map<String, String> process(Stream stream, Map<String, StreamDefinition> streamDefinitions) {
+    public Map<String, String> process(Stream stream, Map<String, StreamDefinitionExt> streamDefinitions) {
         windowStream = (WindowStream) stream;
         this.type = windowStream.getWindow().getName();
         if (type.equals(Constants.TIME_WINDOW) || type.equals(Constants.TIME_BATCH_WINDOW)) {
