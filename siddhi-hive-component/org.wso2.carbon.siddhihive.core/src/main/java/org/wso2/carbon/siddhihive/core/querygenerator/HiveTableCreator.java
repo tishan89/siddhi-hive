@@ -31,9 +31,9 @@ public final class HiveTableCreator extends HiveQueryGenerator {
     }
 
 	//**********************************************************************************************
-	public void setQuery(StreamDefinitionExt outputStreamDef) {
-        sFullStreamID = outputStreamDef.getFullQualifiedStreamID();
-        StreamDefinition def = outputStreamDef.getStreamDefinition();
+	public void setQuery(StreamDefinitionExt streamDef) {
+        sFullStreamID = streamDef.getFullQualifiedStreamID();
+        StreamDefinition def = streamDef.getStreamDefinition();
 		sDBName = def.getStreamId();
         List<Attribute> attributeList = def.getAttributeList();
         sDBName = def.getStreamId();
