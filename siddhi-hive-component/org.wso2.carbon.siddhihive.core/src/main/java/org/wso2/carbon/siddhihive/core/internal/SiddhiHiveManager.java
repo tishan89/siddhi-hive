@@ -2,7 +2,6 @@ package org.wso2.carbon.siddhihive.core.internal;
 
 
 import org.apache.log4j.Logger;
-import org.wso2.carbon.event.stream.manager.core.EventStreamService;
 import org.wso2.carbon.siddhihive.core.headerprocessor.HeaderHandler;
 import org.wso2.carbon.siddhihive.core.internal.ds.SiddhiHiveValueHolder;
 import org.wso2.carbon.siddhihive.core.querygenerator.HiveTableCreator;
@@ -26,12 +25,9 @@ public class SiddhiHiveManager {
     private static final Logger log = Logger.getLogger(SiddhiHiveManager.class);
     private ConcurrentMap<String, org.wso2.carbon.siddhihive.core.configurations.StreamDefinition> streamDefinitionMap; //contains stream definition
     private ConcurrentMap<String, String> queryMap;
-    private EventStreamService eventStreamService;
 
     public SiddhiHiveManager() {
         streamDefinitionMap = new ConcurrentHashMap<String, org.wso2.carbon.siddhihive.core.configurations.StreamDefinition>();
-        eventStreamService = SiddhiHiveValueHolder.getInstance().getEventStreamService();
-
         //New Query Map
         queryMap = new ConcurrentHashMap<String, String>();
     }
@@ -56,8 +52,12 @@ public class SiddhiHiveManager {
 
     public void setSiddhiStreamDefinition(List<StreamDefinition> streamDefinitionList) {
         for (StreamDefinition definition : streamDefinitionList) {
-            org.wso2.carbon.siddhihive.core.configurations.StreamDefinition streamDefinition = new org.wso2.carbon.siddhihive.core.configurations.StreamDefinition(definition.getStreamId(), definition);
-            this.setStreamDefinition(streamDefinition.getFullQualifiedStreamID(), streamDefinition);
+            for (Map.Entry<String, org.wso2.carbon.siddhihive.core.configurations.StreamDefinition> entry : streamDefinitionMap.entrySet()) {
+                if (!(definition.getStreamId().equals(entry.getKey()))) {
+                    org.wso2.carbon.siddhihive.core.configurations.StreamDefinition streamDefinition = new org.wso2.carbon.siddhihive.core.configurations.StreamDefinition(definition.getStreamId(), definition);
+                    this.setStreamDefinition(streamDefinition.getFullQualifiedStreamID(), streamDefinition);
+                }
+            }
         }
     }
 
