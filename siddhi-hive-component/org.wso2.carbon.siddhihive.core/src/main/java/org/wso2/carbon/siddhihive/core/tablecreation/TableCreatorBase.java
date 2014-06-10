@@ -18,7 +18,9 @@ public abstract class TableCreatorBase {
 	
 	//**********************************************************************************************
 	public TableCreatorBase() {
-		
+		sDBName = "";
+        sFullStreamID = "";
+        listColumns = new ArrayList<HiveField>();
 	}
 
     //**********************************************************************************************
