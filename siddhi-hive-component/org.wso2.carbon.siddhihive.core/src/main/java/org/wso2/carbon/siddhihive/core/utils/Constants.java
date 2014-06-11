@@ -33,9 +33,16 @@ public final class Constants {
     public static final String S_INT = "INT";
     public static final String S_DOUBLE = "DOUBLE(16,4)";
     public static final String S_BINARY = "BLOB";
+
     public static final String CASSANDRA_DATASOURCE = "WSO2BAM_CASSANDRA_DATASOURCE";
     public static final String CARBON_DATASOURCE = "WSO2BAM_DATASOURCE";
 
+    public static final String H_LEFT_OUTER_JOIN = "LEFT OUTER JOIN";
+    public static final String H_RIGHT_OUTER_JOIN = "RIGHT OUTER JOIN";
+    public static final String H_FULL_OUTER_JOIN = "FULL OUTER JOIN";
+    public static final String H_JOIN = "JOIN";
+
+    //**********************************************************************************************
     public static final String AND = "AND";
     public static final String OR = "OR";
 
