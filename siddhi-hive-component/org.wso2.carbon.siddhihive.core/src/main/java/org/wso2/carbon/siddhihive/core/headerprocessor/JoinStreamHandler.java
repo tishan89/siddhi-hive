@@ -2,10 +2,13 @@ package org.wso2.carbon.siddhihive.core.headerprocessor;
 
 import org.wso2.carbon.siddhihive.core.configurations.StreamDefinitionExt;
 import org.wso2.carbon.siddhihive.core.handler.ConditionHandler;
+import org.wso2.carbon.siddhihive.core.utils.Constants;
+import org.wso2.carbon.siddhihive.core.utils.Conversions;
 import org.wso2.siddhi.query.api.query.input.BasicStream;
 import org.wso2.siddhi.query.api.query.input.JoinStream;
 import org.wso2.siddhi.query.api.query.input.Stream;
 import org.wso2.siddhi.query.api.query.input.WindowStream;
+import org.wso2.siddhi.query.compiler.SiddhiQLGrammarParser;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +36,23 @@ public class JoinStreamHandler implements StreamHandler {
         ConditionHandler conditionHandler = new ConditionHandler();
         String sCondition = conditionHandler.processCondition(joinStream.getOnCompare());
 
+        String sJoin = Conversions.siddhiToHiveJoin(joinStream.getType());
+
+        String sLeftString = mapLeftStream.get(Constants.FROM_CLAUSE);
+        if (sLeftString == null)
+            sLeftString = mapLeftStream.get(Constants.LENGTH_WIND_FROM_QUERY);
+        sLeftString = sLeftString.replaceFirst(Constants.FROM+" ", "");
+
+        String sRightString = mapRightStream.get(Constants.FROM_CLAUSE);
+        if (sRightString == null)
+            sRightString = mapRightStream.get(Constants.LENGTH_WIND_FROM_QUERY);
+        sRightString = sRightString.replaceFirst(Constants.FROM+" ", "");
+
+        String sQuery = "from (select * from " + joinStream.getLeftStream().getStreamIds().get(0) + " "
+                + sJoin + " " + joinStream.getRightStream().getStreamIds().get(0)+ " ON " + sCondition + ")";
+
         result = new HashMap<String, String>();
+        result.put(Constants.JOIN_CLAUSE, sQuery);
         return result;
     }
 

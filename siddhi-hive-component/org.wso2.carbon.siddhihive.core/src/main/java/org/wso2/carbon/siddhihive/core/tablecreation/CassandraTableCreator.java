@@ -5,7 +5,7 @@ import org.wso2.carbon.siddhihive.core.utils.Constants;
 /**
  * Created by prasad on 6/10/14.
  */
-public class CassandraTableCreator extends TableCreatorBase {
+public final class CassandraTableCreator extends TableCreatorBase {
     //**********************************************************************************************
     private String sCassandraQuery = "";
     private String sCassandraProperties = "";

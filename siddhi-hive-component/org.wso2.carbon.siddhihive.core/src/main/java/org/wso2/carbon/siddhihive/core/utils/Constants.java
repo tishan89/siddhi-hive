@@ -14,7 +14,7 @@ public final class Constants {
 
     public static final String FROM = "from";
     public static final String WHERE = "where";
-
+    public static final String JOIN_CLAUSE = "joinClause";
     public static final String FROM_CLAUSE = "fromClause";
     public static final String WHERE_CLAUSE = "whereClause";
     public static final String INCREMENTAL_CLAUSE = "incremental";
