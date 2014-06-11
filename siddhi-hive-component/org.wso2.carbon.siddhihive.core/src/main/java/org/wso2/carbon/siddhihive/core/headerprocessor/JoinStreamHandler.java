@@ -48,8 +48,7 @@ public class JoinStreamHandler implements StreamHandler {
             sRightString = mapRightStream.get(Constants.LENGTH_WIND_FROM_QUERY);
         sRightString = sRightString.replaceFirst(Constants.FROM+" ", "");
 
-        String sQuery = "from (select * from " + joinStream.getLeftStream().getStreamIds().get(0) + " "
-                + sJoin + " " + joinStream.getRightStream().getStreamIds().get(0)+ " ON " + sCondition + ")";
+        String sQuery = "from (select * from " + sLeftString + " "+ sJoin + " " + sRightString+ " ON " + sCondition + ")";
 
         result = new HashMap<String, String>();
         result.put(Constants.JOIN_CLAUSE, sQuery);
