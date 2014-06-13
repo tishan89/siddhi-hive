@@ -10,9 +10,10 @@ import java.util.List;
 public class Sample01 {
 
 
-    private static String streamdef1 = "define stream StockExchangeStream ( symbol string, price int )";
-    private static String streamdef2 = "define stream StockQuote ( symbol string, avgPrice double )";
-    private static String query1 = " from StockExchangeStream[price >= 20]#window.length(50) " +
+    private static String streamdef1 = "define stream StockExchangeStream1 ( symbol string, price int )";
+    private static String streamdef2 = "define stream StockExchangeStream2 ( symbol string, quantity int )";
+    private static String streamdef3 = "define stream StockQuote ( symbol string, avgPrice double )";
+    private static String query1 = " from StockExchangeStream1[price >= 20]#window.time(50) as t join StockExchangeStream2#window.time(500) as n on t.symbol==n.symbol" +
             " select symbol, avg(price) as avgPrice " +
             " group by symbol having avgPrice > 50 " +
             " insert into StockQuote;";
@@ -24,6 +25,7 @@ public class Sample01 {
     public static void main(String[] args) {
         defList.add(streamdef1);
         defList.add(streamdef2);
+        defList.add(streamdef3);
         nameList.add(fullName1);
         nameList.add(fullName2);
         SampleHelper sampleHelper = new SampleHelper();
