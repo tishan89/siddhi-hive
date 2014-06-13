@@ -15,7 +15,7 @@ public class SiddhiHiveService implements SiddhiHiveServiceInterface {
     @Override
     public String addExecutionPlan(ExecutionPlan executionPlan) {
         siddhiHiveManager = new SiddhiHiveManager();
-        siddhiHiveManager.setStreamDefinitionMap((java.util.concurrent.ConcurrentMap<String, StreamDefinitionExt>) executionPlan.getStreamDefinitionMap());
+        siddhiHiveManager.setStreamDefinitionMap(executionPlan.getStreamDefinitionMap());
         configureSiddhiManager(executionPlan.getStreamDefinitionMap());
         String queryID = siddhiManager.addQuery(executionPlan.getQuery());
         siddhiHiveManager.setSiddhiStreamDefinition(siddhiManager.getStreamDefinitions());
@@ -30,6 +30,8 @@ public class SiddhiHiveService implements SiddhiHiveServiceInterface {
 
         }
     }
+
+
 
     /*@Override
     public Boolean addStreamDefinition(StreamDefinitionExt streamDefinition, String fullQualifiedname) {
