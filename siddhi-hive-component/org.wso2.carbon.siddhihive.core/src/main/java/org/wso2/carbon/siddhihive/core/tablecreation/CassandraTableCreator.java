@@ -2,6 +2,8 @@ package org.wso2.carbon.siddhihive.core.tablecreation;
 
 import org.wso2.carbon.siddhihive.core.utils.Constants;
 
+import java.util.regex.Pattern;
+
 /**
  * Created by prasad on 6/10/14.
  */
@@ -37,7 +39,7 @@ public final class CassandraTableCreator extends TableCreatorBase {
         fillCassandraColumnString();
 
         sCassandraProperties = ("\"wso2.carbon.datasource.name\" = \""+ Constants.CASSANDRA_DATASOURCE+"\", "
-                + "\"cassandra.cf.name\" = \""+sFullStreamID.replaceAll(".", "_")+"\", "
+                + "\"cassandra.cf.name\" = \""+sFullStreamID.replaceAll(Pattern.quote("."), "_")+"\", "
                 + "\"cassandra.columns.mapping\" = \""+sCassandraColumns+"\"");
     }
 
