@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 
 public class SampleHelper {
@@ -21,7 +23,7 @@ public class SampleHelper {
                 siddhiManager.defineStream(definition);
             }
             List<StreamDefinition> siddhiDef = siddhiManager.getStreamDefinitions();
-            Map<String, StreamDefinitionExt> siddhiHiveDef = new HashMap<String, StreamDefinitionExt>();
+            Map<String, StreamDefinitionExt> siddhiHiveDef = new ConcurrentHashMap<String, StreamDefinitionExt>();
             for (int i = 0; i < siddhiDef.size(); i++) {
                 siddhiHiveDef.put(siddhiDef.get(i).getStreamId(), new StreamDefinitionExt(fullQualifiedName.get(i), siddhiDef.get(i)));
             }

@@ -84,7 +84,7 @@ public class SiddhiHiveManager {
 
         OutStream outStream = query.getOutputStream();
         StreamDefinitionExt outStreamDefinition = getStreamDefinition(outStream.getStreamId());
-        TableCreatorBase tableCreator = new CassandraTableCreator();
+        TableCreatorBase tableCreator = new CSVTableCreator();
         tableCreator.setQuery(outStreamDefinition);
         String outputInsertQuery = tableCreator.getInsertQuery();
         String outputCreate = tableCreator.getQuery();
