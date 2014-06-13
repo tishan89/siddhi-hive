@@ -6,6 +6,8 @@ import org.wso2.carbon.siddhihive.core.configurations.StreamDefinitionExt;
 import org.wso2.carbon.siddhihive.core.headerprocessor.HeaderHandler;
 import org.wso2.carbon.siddhihive.core.tablecreation.CSVTableCreator;
 import org.wso2.carbon.siddhihive.core.selectorprocessor.QuerySelectorProcessor;
+import org.wso2.carbon.siddhihive.core.tablecreation.CassandraTableCreator;
+import org.wso2.carbon.siddhihive.core.tablecreation.TableCreatorBase;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.query.Query;
@@ -52,11 +54,9 @@ public class SiddhiHiveManager {
 
     public void setSiddhiStreamDefinition(List<StreamDefinition> streamDefinitionList) {
         for (StreamDefinition definition : streamDefinitionList) {
-            for (Map.Entry<String, StreamDefinitionExt> entry : streamDefinitionMap.entrySet()) {
-                if (!(definition.getStreamId().equals(entry.getKey()))) {
-                    StreamDefinitionExt streamDefinition = new StreamDefinitionExt(definition.getStreamId(), definition);
-                    this.setStreamDefinition(streamDefinition.getFullQualifiedStreamID(), streamDefinition);
-                }
+            if (!streamDefinitionMap.containsKey(definition.getStreamId())) {
+                StreamDefinitionExt streamDefinition = new StreamDefinitionExt(definition.getStreamId(), definition);
+                this.setStreamDefinition(streamDefinition.getFullQualifiedStreamID(), streamDefinition);
             }
         }
     }
@@ -81,10 +81,10 @@ public class SiddhiHiveManager {
         StreamDefinitionExt outStreamDefinition = getStreamDefinition(outStream.getStreamId());
 
 
-        CSVTableCreator CSVTableCreator = new CSVTableCreator();
-        CSVTableCreator.setQuery(outStreamDefinition);
-        String insertQuery = CSVTableCreator.getInsertQuery();
-        String createQuery = CSVTableCreator.getQuery();
+        TableCreatorBase tableCreator = new CassandraTableCreator();
+        tableCreator.setQuery(outStreamDefinition);
+        String insertQuery = tableCreator.getInsertQuery();
+        String createQuery = tableCreator.getQuery();
         //hiveQuery = outputQuery + "\n" +
 
 
