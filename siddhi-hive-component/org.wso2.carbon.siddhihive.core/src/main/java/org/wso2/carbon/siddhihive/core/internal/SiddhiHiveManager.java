@@ -23,8 +23,8 @@ public class SiddhiHiveManager {
 
 
     private static final Logger log = Logger.getLogger(SiddhiHiveManager.class);
-    private ConcurrentMap<String, StreamDefinitionExt> streamDefinitionMap; //contains stream definition
-    private ConcurrentMap<String, String> queryMap;
+    private Map<String, StreamDefinitionExt> streamDefinitionMap; //contains stream definition
+    private Map<String, String> queryMap;
 
     public SiddhiHiveManager() {
         streamDefinitionMap = new ConcurrentHashMap<String, StreamDefinitionExt>();
@@ -32,11 +32,11 @@ public class SiddhiHiveManager {
         queryMap = new ConcurrentHashMap<String, String>();
     }
 
-    public ConcurrentMap<String, StreamDefinitionExt> getStreamDefinitionMap() {
+    public Map<String, StreamDefinitionExt> getStreamDefinitionMap() {
         return streamDefinitionMap;
     }
 
-    public void setStreamDefinitionMap(ConcurrentMap<String, StreamDefinitionExt> streamDefinitionMap) {
+    public void setStreamDefinitionMap(Map<String, StreamDefinitionExt> streamDefinitionMap) {
         this.streamDefinitionMap = streamDefinitionMap;
     }
 
