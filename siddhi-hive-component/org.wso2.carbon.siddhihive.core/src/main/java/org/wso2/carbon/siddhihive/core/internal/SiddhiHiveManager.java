@@ -81,10 +81,8 @@ public class SiddhiHiveManager {
         StreamDefinitionExt outStreamDefinition = getStreamDefinition(outStream.getStreamId());
 
 
-
         CSVTableCreator CSVTableCreator = new CSVTableCreator();
         CSVTableCreator.setQuery(outStreamDefinition);
-
         String insertQuery = CSVTableCreator.getInsertQuery();
         String createQuery = CSVTableCreator.getQuery();
         //hiveQuery = outputQuery + "\n" +
