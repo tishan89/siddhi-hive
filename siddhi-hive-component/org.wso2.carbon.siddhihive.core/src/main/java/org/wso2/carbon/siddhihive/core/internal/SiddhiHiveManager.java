@@ -9,10 +9,13 @@ import org.wso2.carbon.siddhihive.core.selectorprocessor.QuerySelectorProcessor;
 import org.wso2.carbon.siddhihive.core.tablecreation.CassandraTableCreator;
 import org.wso2.carbon.siddhihive.core.tablecreation.TableCreatorBase;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
+import org.wso2.siddhi.core.event.in.InStream;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.query.Query;
+import org.wso2.siddhi.query.api.query.input.Stream;
 import org.wso2.siddhi.query.api.query.output.stream.OutStream;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -54,9 +57,11 @@ public class SiddhiHiveManager {
 
     public void setSiddhiStreamDefinition(List<StreamDefinition> streamDefinitionList) {
         for (StreamDefinition definition : streamDefinitionList) {
-            if (!streamDefinitionMap.containsKey(definition.getStreamId())) {
-                StreamDefinitionExt streamDefinition = new StreamDefinitionExt(definition.getStreamId(), definition);
-                this.setStreamDefinition(streamDefinition.getFullQualifiedStreamID(), streamDefinition);
+            for (Map.Entry<String, StreamDefinitionExt> entry : streamDefinitionMap.entrySet()) {
+                if (!(definition.getStreamId().equals(entry.getKey()))) {
+                    StreamDefinitionExt streamDefinition = new StreamDefinitionExt(definition.getStreamId(), definition);
+                    this.setStreamDefinition(streamDefinition.getFullQualifiedStreamID(), streamDefinition);
+                }
             }
         }
     }
@@ -79,13 +84,29 @@ public class SiddhiHiveManager {
 
         OutStream outStream = query.getOutputStream();
         StreamDefinitionExt outStreamDefinition = getStreamDefinition(outStream.getStreamId());
-
-
         TableCreatorBase tableCreator = new CassandraTableCreator();
         tableCreator.setQuery(outStreamDefinition);
-        String insertQuery = tableCreator.getInsertQuery();
-        String createQuery = tableCreator.getQuery();
-        //hiveQuery = outputQuery + "\n" +
+        String outputInsertQuery = tableCreator.getInsertQuery();
+        String outputCreate = tableCreator.getQuery();
+
+        Stream inStream = query.getInputStream();
+        List<String> lstIDs = inStream.getStreamIds();
+        StreamDefinitionExt inStreamDef;
+
+        String [] arrCreate = new String[lstIDs.size()];
+        int i = 0;
+        for (String s : lstIDs) {
+            inStreamDef = getStreamDefinition(s);
+            tableCreator = new CassandraTableCreator();
+            tableCreator.setQuery(inStreamDef);
+            arrCreate[i++] = tableCreator.getQuery();
+        }
+
+        String inputCreate = "";
+        for (int j=0; j<arrCreate.length; j++) {
+            inputCreate += arrCreate[j];
+            inputCreate += "\n";
+        }
 
 
         String fromClause = headerMap.get(Constants.FROM_CLAUSE);
@@ -116,7 +137,7 @@ public class SiddhiHiveManager {
             incrementalClause = " ";
 
        // hiveQuery = outputQuery + "\n" + incrementalClause + "\n" + fromClause + "\n " + selectQuery + "\n " + groupByQuery + "\n " + havingQuery + "\n " + whereClause + "\n ";
-        hiveQuery = createQuery +"\n" +insertQuery + "\n" + incrementalClause + "\n" + selectQuery + "\n " + fromClause + "\n " +whereClause + "\n " + groupByQuery + "\n " + havingQuery + "\n ";
+        hiveQuery = inputCreate + "\n" + outputCreate +"\n" +outputInsertQuery + "\n" + incrementalClause + "\n" + selectQuery + "\n " + fromClause + "\n " +whereClause + "\n " + groupByQuery + "\n " + havingQuery + "\n ";
 
         return hiveQuery;
 
