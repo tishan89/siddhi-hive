@@ -15,7 +15,7 @@ import java.util.Map;
 public class SampleHelper {
 
     public ExecutionPlan getExecutionPlan(String query, List<String> streamDefList, List<String> fullQualifiedName) {
-        if (streamDefList.size() != fullQualifiedName.size()) {
+        if (streamDefList.size() == fullQualifiedName.size()) {
             SiddhiManager siddhiManager = new SiddhiManager();
             for (String definition : streamDefList) {
                 siddhiManager.defineStream(definition);
