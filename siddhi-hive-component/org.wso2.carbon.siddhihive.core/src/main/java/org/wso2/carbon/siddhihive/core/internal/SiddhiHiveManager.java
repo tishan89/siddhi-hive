@@ -80,17 +80,21 @@ public class SiddhiHiveManager {
         OutStream outStream = query.getOutputStream();
         StreamDefinitionExt outStreamDefinition = getStreamDefinition(outStream.getStreamId());
 
-        CSVTableCreator CSVTableCreator = new CSVTableCreator();
-        //CSVTableCreator.setQuery(outStreamDefinition);
 
-        String outputQuery = CSVTableCreator.getInsertQuery();
+
+        CSVTableCreator CSVTableCreator = new CSVTableCreator();
+        CSVTableCreator.setQuery(outStreamDefinition);
+
+        String insertQuery = CSVTableCreator.getInsertQuery();
+        String createQuery = CSVTableCreator.getQuery();
         //hiveQuery = outputQuery + "\n" +
 
 
         String fromClause = headerMap.get(Constants.FROM_CLAUSE);
-
         if(fromClause == null)
             fromClause = headerMap.get(Constants.LENGTH_WIND_FROM_QUERY);
+        if(fromClause == null)
+            fromClause = headerMap.get(Constants.JOIN_CLAUSE);
 
         String selectQuery = "SELECT " + concurrentSelectorMap.get(Constants.SELECTION_QUERY);
         String groupByQuery = concurrentSelectorMap.get(Constants.GROUP_BY_QUERY);
@@ -114,7 +118,7 @@ public class SiddhiHiveManager {
             incrementalClause = " ";
 
        // hiveQuery = outputQuery + "\n" + incrementalClause + "\n" + fromClause + "\n " + selectQuery + "\n " + groupByQuery + "\n " + havingQuery + "\n " + whereClause + "\n ";
-        hiveQuery = outputQuery + "\n" + incrementalClause + "\n" + selectQuery + "\n " + fromClause + "\n " +whereClause + "\n " + groupByQuery + "\n " + havingQuery + "\n ";
+        hiveQuery = createQuery +"\n" +insertQuery + "\n" + incrementalClause + "\n" + selectQuery + "\n " + fromClause + "\n " +whereClause + "\n " + groupByQuery + "\n " + havingQuery + "\n ";
 
         return hiveQuery;
 

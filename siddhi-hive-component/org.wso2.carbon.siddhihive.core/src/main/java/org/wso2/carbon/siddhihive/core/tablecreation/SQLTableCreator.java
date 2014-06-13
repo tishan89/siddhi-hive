@@ -6,7 +6,7 @@ import org.wso2.carbon.siddhihive.core.utils.Conversions;
 /**
  * Created by prasad on 6/10/14.
  */
-public class SQLTableCreator extends TableCreatorBase{
+public final class SQLTableCreator extends TableCreatorBase{
     //**********************************************************************************************
     private String sSQLQuery = "";
     private String sSQLProperties = "";

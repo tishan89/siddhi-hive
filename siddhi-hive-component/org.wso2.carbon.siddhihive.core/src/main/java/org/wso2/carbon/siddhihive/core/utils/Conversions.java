@@ -1,6 +1,7 @@
 package org.wso2.carbon.siddhihive.core.utils;
 
 import org.wso2.siddhi.query.api.definition.Attribute;
+import org.wso2.siddhi.query.api.query.input.JoinStream;
 
 /**
  * Created by prasad on 6/10/14.
@@ -30,6 +31,23 @@ public class Conversions {
             return Constants.S_DOUBLE;
         } else {
             return Constants.S_BINARY;
+        }
+    }
+
+    //**********************************************************************************************
+    public static String siddhiToHiveJoin(JoinStream.Type type) {
+        switch (type) {
+            case FULL_OUTER_JOIN:
+                return Constants.H_FULL_OUTER_JOIN;
+            case LEFT_OUTER_JOIN:
+                return Constants.H_LEFT_OUTER_JOIN;
+            case RIGHT_OUTER_JOIN:
+                return Constants.H_RIGHT_OUTER_JOIN;
+            case JOIN:
+                return Constants.H_JOIN;
+            default:
+                return Constants.H_JOIN;
+
         }
     }
 }
