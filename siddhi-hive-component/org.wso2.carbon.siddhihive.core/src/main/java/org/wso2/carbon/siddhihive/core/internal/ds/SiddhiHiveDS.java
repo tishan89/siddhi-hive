@@ -1,6 +1,6 @@
 package org.wso2.carbon.siddhihive.core.internal.ds;
 
-
+/*
 import org.apache.log4j.Logger;
 import org.osgi.service.component.ComponentContext;
 //import org.wso2.carbon.event.stream.manager.core.EventStreamService;
@@ -11,13 +11,14 @@ import org.wso2.carbon.siddhihive.core.internal.SiddhiHiveService;
  * @scr.component name="siddhiHive.component" immediate="true"
  */
 public class SiddhiHiveDS {
-    private static final Logger log = Logger.getLogger(SiddhiHiveDS.class);
+    //private static final Logger log = Logger.getLogger(SiddhiHiveDS.class);
 
     /**
      * Exposing SiddhiHive OSGi service.
      *
      * @param context
      */
+    /*
     protected void activate(ComponentContext context) {
 
         try {
@@ -34,7 +35,7 @@ public class SiddhiHiveDS {
     protected void deactivate(ComponentContext context) {
         // context.getBundleContext().ungetService();
     }
-
+    */
     /*protected void setEventStreamService(EventStreamService eventStreamService) {
         SiddhiHiveValueHolder.getInstance().setEventStreamService(eventStreamService);
     }
