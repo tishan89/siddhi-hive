@@ -2,6 +2,7 @@ package org.wso2.carbon.siddhihive.core.headerprocessor;
 
 import org.wso2.carbon.siddhihive.core.configurations.StreamDefinitionExt;
 import org.wso2.carbon.siddhihive.core.handler.ConditionHandler;
+import org.wso2.carbon.siddhihive.core.internal.SiddhiHiveManager;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
 import org.wso2.carbon.siddhihive.core.utils.Conversions;
 import org.wso2.siddhi.query.api.query.input.BasicStream;
@@ -20,10 +21,11 @@ public class JoinStreamHandler implements StreamHandler {
     //**********************************************************************************************
     private Map<String, String> result;
     private JoinStream joinStream;
+    private SiddhiHiveManager siddhiHiveManager = null;
 
     //**********************************************************************************************
-    public JoinStreamHandler() {
-
+    public JoinStreamHandler(SiddhiHiveManager siddhiHiveManager) {
+        this.siddhiHiveManager = siddhiHiveManager;
     }
 
     //**********************************************************************************************
@@ -33,7 +35,7 @@ public class JoinStreamHandler implements StreamHandler {
         Map<String, String> mapLeftStream = processSubStream(joinStream.getLeftStream(), streamDefinitions);
         Map<String, String> mapRightStream = processSubStream(joinStream.getRightStream(), streamDefinitions);
 
-        ConditionHandler conditionHandler = new ConditionHandler();
+        ConditionHandler conditionHandler = new ConditionHandler(this.siddhiHiveManager);
         String sCondition = conditionHandler.processCondition(joinStream.getOnCompare());
 
         String sJoin = Conversions.siddhiToHiveJoin(joinStream.getType());
@@ -59,10 +61,10 @@ public class JoinStreamHandler implements StreamHandler {
     private Map<String, String> processSubStream(Stream stream, Map<String, StreamDefinitionExt> streamDefinitions) {
         Map<String, String> result;
         if (stream instanceof BasicStream) {
-            BasicStreamHandler basicStreamHandler = new BasicStreamHandler();
+            BasicStreamHandler basicStreamHandler = new BasicStreamHandler(this.siddhiHiveManager);
             result = basicStreamHandler.process(stream, streamDefinitions);
         } else if (stream instanceof WindowStream) {
-            WindowStreamHandler windowStreamHandler = new WindowStreamHandler();
+            WindowStreamHandler windowStreamHandler = new WindowStreamHandler(this.siddhiHiveManager);
             result = windowStreamHandler.process(stream, streamDefinitions);
         } else {
             result = null;

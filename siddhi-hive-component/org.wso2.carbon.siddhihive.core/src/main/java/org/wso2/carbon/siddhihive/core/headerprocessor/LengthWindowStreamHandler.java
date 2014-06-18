@@ -1,7 +1,10 @@
 package org.wso2.carbon.siddhihive.core.headerprocessor;
 
 import org.wso2.carbon.siddhihive.core.configurations.StreamDefinitionExt;
+import org.wso2.carbon.siddhihive.core.internal.SiddhiHiveManager;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
+import org.wso2.carbon.siddhihive.core.utils.ProcessingMode;
+import org.wso2.carbon.siddhihive.core.utils.WindowProcessingState;
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.expression.Expression;
@@ -29,34 +32,86 @@ public class LengthWindowStreamHandler extends WindowStreamHandler {
     private String selectParamsClause;
     private String limitClause;
 
-    public LengthWindowStreamHandler(){
+    private int subqueryCounter = 0;
 
+    public LengthWindowStreamHandler(SiddhiHiveManager siddhiHiveManagerParam){
+
+        super(siddhiHiveManagerParam);
         this.windowIsolator = new WindowIsolator();
     }
+
     public Map<String, String> process(Stream stream, Map<String, StreamDefinitionExt> streamDefinitions){
 
         this.windowStream = (WindowStream) stream;
+        addStreamReference(this.windowStream.getStreamReferenceId(), this.windowStream.getStreamId());
 
 
-        result = new HashMap<String, String>();
+
+        //update the SiddhiManager with abstraction details with referenceID <---> generated query t --> subq1
+
+        String type = windowStream.getWindow().getName();
+
+        //if( type.equals(Constants.LENGTH_WINDOW)){
+            selectParamsClause = generateWindowSelectClause(); //SELECT     StockExchangeStream.symbol  , StockExchangeStream.price , StockExchangeStream.timestamps
+        //}
+
+       // if(! type.equals(Constants.LENGTH_WINDOW))    {
 
 
-        whereClause = generateWhereClause(windowStream.getFilter());
-        selectParamsClause = generateWindowSelectClause();
-        limitClause = generateLimitLength();
 
-        fromClause = assembleFromClause();
+        //temporarily enable them
+//            String streamID = windowStream.getStreamId();
+//            this.getSiddhiHiveManager().addCachedValues(streamID, getSubQueryIdentifier(false));
+            whereClause = generateWhereClause(windowStream.getFilter()); //where   A.symbol   =   "IBM"
 
-        result.put(Constants.LENGTH_WIND_FROM_QUERY, fromClause);
+            limitClause = generateLimitLength();
+
+            fromClause = assembleWindowFromClause(); //  from
+        //(
+          //      SELECT     StockExchangeStream.symbol  , StockExchangeStream.price , StockExchangeStream.timestamps  ORDER BY timestamps DESC LIMIT   1
+        //)      A
+
+
+
+            result = new HashMap<String, String>();
+            result.put(Constants.LENGTH_WIND_FROM_QUERY, fromClause);
+
+            getSiddhiHiveManager().setWindowProcessingState(WindowProcessingState.WINDOW_PROCESSED);
+
+       // }
         return result;
     }
 
-    private String assembleFromClause(){
+    private String assembleWindowFromClause(){
 
         if(whereClause.isEmpty())
             whereClause = " ";
 
-        return Constants.FROM + "  " + Constants.OPENING_BRACT + "   " + selectParamsClause + " " + whereClause + "  " + limitClause + "   " + Constants.CLOSING_BRACT + "     A";
+        String subQueryIdentifier = "";
+
+        String streamReferenceID = this.windowStream.getStreamReferenceId();
+        String streamID =  this.windowStream.getStreamId();
+
+        if( streamID.equalsIgnoreCase(streamReferenceID))
+            subQueryIdentifier = getSubQueryIdentifier(true);
+        else
+            subQueryIdentifier = streamReferenceID;
+
+        getSiddhiHiveManager().addStreamGeneratedQueryID(streamReferenceID,subQueryIdentifier);
+        getSiddhiHiveManager().addCachedValues(this.windowStream.getStreamId(), subQueryIdentifier);
+        return Constants.FROM + "  " + Constants.OPENING_BRACT + "   " + selectParamsClause + " " + Constants.FROM  + "  " + windowStream.getStreamId() + " " + whereClause + "  " + limitClause + "   " + Constants.CLOSING_BRACT + subQueryIdentifier;
+    }
+
+    private String getSubQueryIdentifier(boolean generateID){
+
+        String subqueryIdentifier = "subq";
+
+        if(generateID)
+            subqueryIdentifier += String.valueOf(++subqueryCounter);
+        else
+            subqueryIdentifier += String.valueOf(subqueryCounter);
+
+        return subqueryIdentifier;
     }
 
     private String generateWindowSelectClause(){
@@ -69,19 +124,18 @@ public class LengthWindowStreamHandler extends WindowStreamHandler {
 
             ArrayList<Attribute> attributeArrayList = (ArrayList<Attribute>) streamDefinition.getAttributeList();
 
-            String streamId = streamDefinition.getStreamId();
-
+            String streamID = windowStream.getStreamId();
             for(int i=0; i < attributeArrayList.size(); ++i){
 
                 Attribute attribute = attributeArrayList.get(i);
 
                 if( params.isEmpty())
-                    params += "  " + streamId + "." + attribute.getName() + " ";
+                    params += "  " + streamID + "." + attribute.getName() + " ";
                 else
-                    params += " , " + streamId + "." + attribute.getName() + " ";
+                    params += " , " + streamID + "." + attribute.getName() + " ";
             }
 
-            params += ", " + Constants.TIMESTAMPS_COLUMN + " ";
+            params += ", " + streamID + "." + Constants.TIMESTAMPS_COLUMN + " ";
         }
 
         if(params.isEmpty())

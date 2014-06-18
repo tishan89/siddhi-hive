@@ -1,5 +1,6 @@
 package org.wso2.carbon.siddhihive.core.handler;
 
+import org.wso2.carbon.siddhihive.core.internal.SiddhiHiveManager;
 import org.wso2.siddhi.query.api.expression.Expression;
 import org.wso2.siddhi.query.api.expression.Variable;
 import org.wso2.siddhi.query.api.query.selection.attribute.ComplexAttribute;
@@ -11,9 +12,11 @@ import org.wso2.siddhi.query.api.query.selection.attribute.SimpleAttribute;
 public class AttributeHandler {
 
     private ConditionHandler conditionHandler = null;
+    private SiddhiHiveManager siddhiHiveManager = null;
+    public AttributeHandler(SiddhiHiveManager siddhiHiveManager) {
+        this.siddhiHiveManager = siddhiHiveManager;
 
-    public AttributeHandler() {
-        conditionHandler = new ConditionHandler();
+        conditionHandler = new ConditionHandler(this.siddhiHiveManager);
     }
 
     public String handleSimpleAttribute(SimpleAttribute simpleAttribute) {

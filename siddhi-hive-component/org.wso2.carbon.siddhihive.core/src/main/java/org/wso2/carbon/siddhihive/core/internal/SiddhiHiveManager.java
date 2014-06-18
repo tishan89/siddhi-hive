@@ -9,13 +9,13 @@ import org.wso2.carbon.siddhihive.core.selectorprocessor.QuerySelectorProcessor;
 import org.wso2.carbon.siddhihive.core.tablecreation.CassandraTableCreator;
 import org.wso2.carbon.siddhihive.core.tablecreation.TableCreatorBase;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
-import org.wso2.siddhi.core.event.in.InStream;
+import org.wso2.carbon.siddhihive.core.utils.ProcessingMode;
+import org.wso2.carbon.siddhihive.core.utils.WindowProcessingState;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.query.Query;
 import org.wso2.siddhi.query.api.query.input.Stream;
 import org.wso2.siddhi.query.api.query.output.stream.OutStream;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,17 +24,35 @@ import java.util.concurrent.ConcurrentMap;
 /*
 Class to manage query conversion in higher level. Will call appropriate handlers. Will also contain initial data needed for the conversion.
  */
+
 public class SiddhiHiveManager {
 
 
     private static final Logger log = Logger.getLogger(SiddhiHiveManager.class);
-    private Map<String, StreamDefinitionExt> streamDefinitionMap; //contains stream definition
-    private Map<String, String> queryMap;
 
-    public SiddhiHiveManager() {
+    private Map<String, StreamDefinitionExt> streamDefinitionMap= null; //contains stream definition
+    private Map<String, String> queryMap= null;
+    private Map<String, String> inputStreamReferenceIDMap= null;// map to maintain both the stream ID and stream reference ID
+
+    private Map<String, String> cachedValuesMap= null; //parent refernce
+    private Map<String, String> inputStreamGeneratedQueryMap= null; // reference ID <-----> Replacement generatedQueryID
+
+    private ProcessingMode processingMode;
+    private WindowProcessingState windowProcessingState;
+
+
+    private ConcurrentMap<String, String> selectionAttributeRenameMap = null;
+
+   public SiddhiHiveManager() {
         streamDefinitionMap = new ConcurrentHashMap<String, StreamDefinitionExt>();
         //New Query Map
         queryMap = new ConcurrentHashMap<String, String>();
+        inputStreamReferenceIDMap = new ConcurrentHashMap<String, String>();
+        cachedValuesMap = new ConcurrentHashMap<String, String>();
+        inputStreamGeneratedQueryMap =  new ConcurrentHashMap<String, String>();
+        selectionAttributeRenameMap = new ConcurrentHashMap<String, String>();
+
+        windowProcessingState = WindowProcessingState.NONE;
     }
 
     public Map<String, StreamDefinitionExt> getStreamDefinitionMap() {
@@ -53,6 +71,74 @@ public class SiddhiHiveManager {
         for (StreamDefinitionExt definition : streamDefinitionList) {
             streamDefinitionMap.put(definition.getStreamDefinition().getStreamId(), definition);
         }
+    }
+
+    public String getStreamReferenceID(String referenceID) {
+
+        String streamID = inputStreamReferenceIDMap.get(referenceID);
+
+        if(  streamID != null)
+            return streamID;
+
+        return null;
+    }
+
+    public String getStreamGeneratedQueryID(String referenceID){
+        return inputStreamGeneratedQueryMap.get(referenceID);
+    }
+
+    public void addStreamGeneratedQueryID(String referenceID, String streamGeneratedQueryID){
+         inputStreamGeneratedQueryMap.put(referenceID, streamGeneratedQueryID);
+    }
+
+    public void setInputStreamReferenceID(String referenceID, String streamID) {
+        this.inputStreamReferenceIDMap.put(referenceID, streamID);
+    }
+
+    public void addCachedValues(String cachedID, String cachedValue) {
+        this.cachedValuesMap.put(cachedID,cachedValue);
+    }
+
+    public String getCachedValues(String cachedID ) {
+
+        String cachedValue = cachedValuesMap.get(cachedID);
+
+        if(  cachedValue != null){
+            return cachedValue;
+        }else{
+
+            if( cachedValuesMap.containsValue(cachedID) )
+                return cachedID;
+        }
+        return null;
+    }
+
+    public String getSelectionAttributeRenameMap(String rename) {
+        return this.selectionAttributeRenameMap.get(rename);
+    }
+
+    public void addSelectionStringMap(String rename, String selectionString) {
+        this.selectionAttributeRenameMap.put(rename, selectionString);
+    }
+
+    public ProcessingMode getProcessingMode() {
+        return processingMode;
+    }
+
+    public void setProcessingMode(ProcessingMode processingMode) {
+        this.processingMode = processingMode;
+    }
+
+    public WindowProcessingState getWindowProcessingState() {
+        return windowProcessingState;
+    }
+
+    public void setWindowProcessingState(WindowProcessingState windowProcessingState) {
+        this.windowProcessingState = windowProcessingState;
+    }
+
+    public void removedCachedValues(String cachedID) {
+        this.cachedValuesMap.remove(cachedID);
     }
 
     public void setSiddhiStreamDefinition(List<StreamDefinition> streamDefinitionList) {
@@ -74,14 +160,18 @@ public class SiddhiHiveManager {
 
 
         String hiveQuery = "";
-        HeaderHandler headerHandler = new HeaderHandler();
+
+        setProcessingMode(ProcessingMode.INPUT_STREAM.INPUT_STREAM);
+        HeaderHandler headerHandler = new HeaderHandler(this);
         Map<String, String> headerMap = headerHandler.process(query.getInputStream(), this.getStreamDefinitionMap());
 
 
-        QuerySelectorProcessor querySelectorProcessor = new QuerySelectorProcessor();
+        setProcessingMode(ProcessingMode.INPUT_STREAM.SELECTOR);
+        QuerySelectorProcessor querySelectorProcessor = new QuerySelectorProcessor(this);
         querySelectorProcessor.handleSelector(query.getSelector());
         ConcurrentMap<String, String> concurrentSelectorMap = querySelectorProcessor.getSelectorQueryMap();
 
+        setProcessingMode(ProcessingMode.OUTPUT_STREAM);
         OutStream outStream = query.getOutputStream();
         StreamDefinitionExt outStreamDefinition = getStreamDefinition(outStream.getStreamId());
         TableCreatorBase tableCreator = new CSVTableCreator();

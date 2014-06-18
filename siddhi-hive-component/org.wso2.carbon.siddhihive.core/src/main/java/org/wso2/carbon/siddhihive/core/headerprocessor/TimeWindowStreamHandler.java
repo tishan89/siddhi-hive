@@ -2,7 +2,10 @@ package org.wso2.carbon.siddhihive.core.headerprocessor;
 
 
 import org.wso2.carbon.siddhihive.core.configurations.StreamDefinitionExt;
+import org.wso2.carbon.siddhihive.core.internal.SiddhiHiveManager;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
+import org.wso2.carbon.siddhihive.core.utils.ProcessingMode;
+import org.wso2.carbon.siddhihive.core.utils.WindowProcessingState;
 import org.wso2.siddhi.query.api.expression.constant.IntConstant;
 import org.wso2.siddhi.query.api.query.input.Stream;
 import org.wso2.siddhi.query.api.query.input.WindowStream;
@@ -20,13 +23,17 @@ public class TimeWindowStreamHandler extends WindowStreamHandler {
     private WindowIsolator windowIsolator;
     private Map<String, String> result;
 
-    public TimeWindowStreamHandler() {
+    public TimeWindowStreamHandler(SiddhiHiveManager siddhiHiveManagerParam) {
+        super(siddhiHiveManagerParam);
         this.windowIsolator = new WindowIsolator();
     }
 
     @Override
     public Map<String, String> process(Stream stream, Map<String, StreamDefinitionExt> streamDefinitions) {
         this.windowStream = (WindowStream) stream;
+
+        addStreamReference(this.windowStream.getStreamReferenceId(), this.windowStream.getStreamId());
+
         windowIsolatorClause = generateIsolatorClause(windowStream.getStreamId(), windowStream.getWindow(), streamDefinitions);
         fromClause = generateFromClause(windowStream.getStreamId());
         whereClause = generateWhereClause(windowStream.getFilter());
@@ -36,6 +43,7 @@ public class TimeWindowStreamHandler extends WindowStreamHandler {
         result.put(Constants.WHERE_CLAUSE, whereClause);
         result.put(Constants.INCREMENTAL_CLAUSE, windowIsolatorClause);
         result.put(Constants.TIME_WINDOW_FREQUENCY, schedulingFreq);
+        getSiddhiHiveManager().setWindowProcessingState(WindowProcessingState.WINDOW_PROCESSED);
         return result;
     }
 

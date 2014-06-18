@@ -1,6 +1,9 @@
 package org.wso2.carbon.siddhihive.core.handler;
 
+import org.wso2.carbon.siddhihive.core.internal.SiddhiHiveManager;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
+import org.wso2.carbon.siddhihive.core.utils.ProcessingMode;
+import org.wso2.carbon.siddhihive.core.utils.WindowProcessingState;
 import org.wso2.siddhi.query.api.condition.*;
 import org.wso2.siddhi.query.api.expression.Expression;
 import org.wso2.siddhi.query.api.expression.Multiply;
@@ -12,8 +15,11 @@ import org.wso2.siddhi.query.api.expression.constant.*;
  */
 public class ConditionHandler {
 
-    public ConditionHandler() {
+    private SiddhiHiveManager siddhiHiveManager;
 
+    public ConditionHandler(SiddhiHiveManager siddhiHiveManager) {
+
+        this.siddhiHiveManager = siddhiHiveManager;
     }
 
     public String processCondition(Condition condition) {
@@ -94,7 +100,38 @@ public class ConditionHandler {
     }
 
     public String handleVariable(Variable variable) {
-        return (variable.getStreamId() != null ? (variable.getStreamId() + ".") : "") + variable.getAttributeName();
+        // return (variable.getStreamId() != null ? (siddhiHiveManager.getStreamReferenceID(variable.getStreamId()) + ".") : variable.getStreamId()) + variable.getAttributeName();
+
+        String variableName ="";
+        if(variable.getStreamId() != null){
+
+          if (siddhiHiveManager.getProcessingMode() == ProcessingMode.SELECTOR && siddhiHiveManager.getWindowProcessingState() == WindowProcessingState.WINDOW_PROCESSED){
+                variableName = siddhiHiveManager.getCachedValues(variable.getStreamId());
+            }
+            else{
+                if (siddhiHiveManager.getStreamReferenceID(variable.getStreamId()) != null ){
+                    variableName =  siddhiHiveManager.getStreamReferenceID(variable.getStreamId());
+                }
+                else {
+                    variableName = variable.getStreamId();
+                }
+            }
+
+            variableName += "."  ;
+            variableName += variable.getAttributeName();
+        }
+        else{
+            //if this is a having condition mode operator with null streamID
+            if (siddhiHiveManager.getProcessingMode() == ProcessingMode.SELECTOR_HAVING){
+                variableName = siddhiHiveManager.getSelectionAttributeRenameMap(variable.getAttributeName());
+            }
+
+            if(variableName == null)
+                variableName = variable.getAttributeName(); //This for safety. sort of Hack
+
+        }
+
+        return variableName;
     }
 
     public String getOperator(Condition.Operator operator) {

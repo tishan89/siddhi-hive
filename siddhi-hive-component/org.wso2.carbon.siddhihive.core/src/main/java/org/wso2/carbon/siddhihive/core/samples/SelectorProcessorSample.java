@@ -22,7 +22,7 @@ public class SelectorProcessorSample {
         SiddhiManager siddhiManager = new SiddhiManager();
 
         siddhiManager.defineStream("define stream StockExchangeStream ( symbol string, price int )");
-        //siddhiManager.defineStream("define stream StockQuote ( symbol string, avgPrice double )");
+        siddhiManager.defineStream("define stream StockQuote ( symbol string, avgPrice double )");
 //        String queryID = siddhiManager.addQuery(" from StockExchangeStream[price >= 20]#window.length(50) " +
 //                                                " select symbol, avg(price) as avgPrice " +
 //                " group by symbol having avgPrice > 50 " +
@@ -30,13 +30,19 @@ public class SelectorProcessorSample {
 //
 //        Query query = siddhiManager.getQuery(queryID);
 //
-        QuerySelectorProcessor selectorProcessor = new QuerySelectorProcessor();
+        SiddhiHiveManager siddhiHiveManager = new SiddhiHiveManager();
+        QuerySelectorProcessor selectorProcessor = new QuerySelectorProcessor(siddhiHiveManager);
 //        HashMap<String, String> map = (HashMap<String, String>)selectorProcessor.handleSelector(query);
 //
 //        for (Object value : map.values()) {
 //
 //            System.out.println(value.toString());
 //        }
+
+//        from TickEvent[symbol==’IBM’]#window.length(2000) join
+//        NewsEvent#window.time(500)
+//        select *
+//                insert into JoinStream
 
 //        from StockExchangeStream#window.time(1 min)
 //        " +
@@ -46,11 +52,19 @@ public class SelectorProcessorSample {
 //                "insert into FastMovingStockQuotes;
 
         System.out.println("+++++++++++++++++++++++++++");
-        String queryID = siddhiManager.addQuery(" from StockExchangeStream[symbol == \"IBM\"]#window.length(6000)\n" +
+        String queryID = siddhiManager.addQuery(" from StockExchangeStream[symbol == \"IBM\"]#window.length(1)\n" +
                 "select symbol,price, avg(price) as averagePrice \n" +
-                "group by symbol, price\n" +
+                "group by symbol\n" +
                 "having ((price > averagePrice*1.02) and ( (averagePrice*0.98 > price) or (averagePrice*0.98 < price) ))\n" +
                 "insert into FastMovingStockQuotes;");
+
+
+
+//           String queryID = siddhiManager.addQuery(" from StockExchangeStream[symbol == \"IBM\"]#window.length(6000) \n" +
+//                "join StockQuote#window.length(500)  \n" +
+//                " on StockExchangeStream.symbol == StockQuote.symbol  select *\n" +
+//                "insert into JoinStream;");
+
 
         Query query = siddhiManager.getQuery(queryID);
 
@@ -58,7 +72,7 @@ public class SelectorProcessorSample {
         List<StreamDefinition> streamDefinitionList = siddhiManager.getStreamDefinitions();
         List<StreamDefinitionExt> streamDefinitionExtList = new ArrayList<StreamDefinitionExt>() ;
 
-        SiddhiHiveManager siddhiHiveManager = new SiddhiHiveManager();
+
 
 
         for (int i = 0; i < streamDefinitionList.size(); ++i) {

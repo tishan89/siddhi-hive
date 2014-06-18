@@ -6,10 +6,13 @@ package org.wso2.carbon.siddhihive.core.selectorprocessor;
 
 import org.wso2.carbon.siddhihive.core.handler.AttributeHandler;
 import org.wso2.carbon.siddhihive.core.handler.ConditionHandler;
+import org.wso2.carbon.siddhihive.core.internal.SiddhiHiveManager;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
+import org.wso2.carbon.siddhihive.core.utils.ProcessingMode;
 import org.wso2.siddhi.query.api.condition.AndCondition;
 import org.wso2.siddhi.query.api.condition.Condition;
 import org.wso2.siddhi.query.api.condition.OrCondition;
+import org.wso2.siddhi.query.api.expression.Expression;
 import org.wso2.siddhi.query.api.expression.Variable;
 import org.wso2.siddhi.query.api.query.selection.Selector;
 import org.wso2.siddhi.query.api.query.selection.attribute.ComplexAttribute;
@@ -17,6 +20,7 @@ import org.wso2.siddhi.query.api.query.selection.attribute.OutputAttribute;
 import org.wso2.siddhi.query.api.query.selection.attribute.OutputAttributeExtension;
 import org.wso2.siddhi.query.api.query.selection.attribute.SimpleAttribute;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -26,14 +30,23 @@ public class QuerySelectorProcessor {
 
     private ConditionHandler conditionHandler = null;
     private AttributeHandler attributeHandler = null;
+    private SiddhiHiveManager siddhiHiveManager = null;
+
     private ConcurrentMap<String, String> selectorQueryMap = null;
+    private List<SimpleAttribute> simpleAttributeList = null;
+    private ConcurrentMap<String, String> selectionStringMap = null; //rename and selection name
 
-    public QuerySelectorProcessor() {
 
-        conditionHandler = new ConditionHandler();
-        attributeHandler = new AttributeHandler();
+    public QuerySelectorProcessor(SiddhiHiveManager siddhiHiveManager) {
+
+        this.siddhiHiveManager = siddhiHiveManager;
+        conditionHandler = new ConditionHandler(this.siddhiHiveManager);
+        attributeHandler = new AttributeHandler(this.siddhiHiveManager);
 
         selectorQueryMap = new ConcurrentHashMap<String, String>();
+        simpleAttributeList = new ArrayList<SimpleAttribute>();
+
+        selectionStringMap = new ConcurrentHashMap<String, String>();
     }
 
     public boolean handleSelector(Selector selector) {
@@ -73,6 +86,8 @@ public class QuerySelectorProcessor {
 
             OutputAttribute outputAttribute = selectionList.get(i);
 
+            postProcessAttributes(outputAttribute);
+
             if (outputAttribute instanceof SimpleAttribute) {
                 selectionString += attributeHandler.handleSimpleAttribute((SimpleAttribute) outputAttribute);
             } else if (outputAttribute instanceof ComplexAttribute) {
@@ -88,27 +103,51 @@ public class QuerySelectorProcessor {
         return selectionString;
     }
 
+    private void postProcessAttributes(OutputAttribute outputAttribute){
+
+        if(outputAttribute instanceof SimpleAttribute){
+            simpleAttributeList.add((SimpleAttribute) outputAttribute);
+
+            String selectionString = attributeHandler.handleSimpleAttribute((SimpleAttribute) outputAttribute);
+            this.siddhiHiveManager.addSelectionStringMap(outputAttribute.getRename(), selectionString);
+      }
+    }
+
     private String handleGroupByList(Selector selector) {
 
         String groupBy = " GROUP BY ";
-        List<Variable> groupByList = selector.getGroupByList();
 
-        int groupByListSize = groupByList.size();
-
-        if (groupByListSize == 0)
-            return " ";
+        int groupByListSize = simpleAttributeList.size();
 
         for (int i = 0; i < groupByListSize; i++) {
+            SimpleAttribute simpleAttribute = simpleAttributeList.get(i);
+            Expression expression = simpleAttribute.getExpression();
 
-            Variable variable = groupByList.get(i);
+            if (expression instanceof Variable) {
+                groupBy += "  " + conditionHandler.handleVariable((Variable)expression);
 
-            groupBy += "  " + conditionHandler.handleVariable(variable);
-
-            if ((groupByListSize > 1) && ((i + 1) < groupByListSize))
-                groupBy += " , ";
-
-
+                if ((groupByListSize > 1) && ((i + 1) < groupByListSize))
+                    groupBy += " , ";
+            }
         }
+//        List<Variable> groupByList = selector.getGroupByList();
+//
+//        int groupByListSize = groupByList.size();
+//
+//        if (groupByListSize == 0)
+//            return " ";
+//
+//        for (int i = 0; i < groupByListSize; i++) {
+//
+//            Variable variable = groupByList.get(i);
+//
+//            groupBy += "  " + conditionHandler.handleVariable(variable);
+//
+//            if ((groupByListSize > 1) && ((i + 1) < groupByListSize))
+//                groupBy += " , ";
+//
+//
+//        }
 
         return groupBy;
     }
@@ -121,12 +160,18 @@ public class QuerySelectorProcessor {
         if (condition == null)
             return " ";
 
+        ProcessingMode oldProcessingMode = siddhiHiveManager.getProcessingMode();
+
+        siddhiHiveManager.setProcessingMode(ProcessingMode.SELECTOR_HAVING);
+
         handleCondition = conditionHandler.processCondition(condition);
 
         if ((condition instanceof OrCondition) || (condition instanceof AndCondition))
             handleCondition = Constants.OPENING_BRACT + Constants.SPACE + handleCondition + Constants.SPACE + Constants.CLOSING_BRACT;
 
         handleCondition = Constants.HAVING + handleCondition;
+
+        siddhiHiveManager.setProcessingMode(oldProcessingMode);
 
         return handleCondition;
     }
