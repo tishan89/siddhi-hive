@@ -7,7 +7,8 @@ public enum WindowProcessingState {
 
     WINDOW_PROCESSING(4),
     WINDOW_PROCESSED(5),
-    NONE(6);
+    WINDOW_WHERE_PROCESSED(6),
+    NONE(7);
 
     private int code;
 

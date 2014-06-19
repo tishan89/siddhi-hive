@@ -20,6 +20,8 @@ import org.wso2.siddhi.query.api.query.selection.attribute.OutputAttribute;
 import org.wso2.siddhi.query.api.query.selection.attribute.OutputAttributeExtension;
 import org.wso2.siddhi.query.api.query.selection.attribute.SimpleAttribute;
 
+
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -130,24 +132,6 @@ public class QuerySelectorProcessor {
                     groupBy += " , ";
             }
         }
-//        List<Variable> groupByList = selector.getGroupByList();
-//
-//        int groupByListSize = groupByList.size();
-//
-//        if (groupByListSize == 0)
-//            return " ";
-//
-//        for (int i = 0; i < groupByListSize; i++) {
-//
-//            Variable variable = groupByList.get(i);
-//
-//            groupBy += "  " + conditionHandler.handleVariable(variable);
-//
-//            if ((groupByListSize > 1) && ((i + 1) < groupByListSize))
-//                groupBy += " , ";
-//
-//
-//        }
 
         return groupBy;
     }

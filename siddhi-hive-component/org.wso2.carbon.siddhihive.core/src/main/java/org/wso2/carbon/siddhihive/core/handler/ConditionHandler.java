@@ -100,36 +100,73 @@ public class ConditionHandler {
     }
 
     public String handleVariable(Variable variable) {
-        // return (variable.getStreamId() != null ? (siddhiHiveManager.getStreamReferenceID(variable.getStreamId()) + ".") : variable.getStreamId()) + variable.getAttributeName();
+        // return (variable.getStreaimId() != null ? (siddhiHiveManager.getStreamReferenceID(variable.getStreamId()) + ".") : variable.getStreamId()) + variable.getAttributeName();
 
         String variableName ="";
-        if(variable.getStreamId() != null){
+        String streamID = "";
 
-          if (siddhiHiveManager.getProcessingMode() == ProcessingMode.SELECTOR && siddhiHiveManager.getWindowProcessingState() == WindowProcessingState.WINDOW_PROCESSED){
-                variableName = siddhiHiveManager.getCachedValues(variable.getStreamId());
-            }
-            else{
-                if (siddhiHiveManager.getStreamReferenceID(variable.getStreamId()) != null ){
-                    variableName =  siddhiHiveManager.getStreamReferenceID(variable.getStreamId());
-                }
-                else {
-                    variableName = variable.getStreamId();
-                }
-            }
+        if(siddhiHiveManager.getCachedValues("STREAM_ID") != null )
+            streamID = siddhiHiveManager.getCachedValues("STREAM_ID");
 
-            variableName += "."  ;
-            variableName += variable.getAttributeName();
+        if(streamID.isEmpty() == false){
+            variableName = streamID;
+        }else{
+
+            if(variable.getStreamId() != null){
+
+                variableName = variable.getStreamId();
+            }
         }
-        else{
-            //if this is a having condition mode operator with null streamID
-            if (siddhiHiveManager.getProcessingMode() == ProcessingMode.SELECTOR_HAVING){
-                variableName = siddhiHiveManager.getSelectionAttributeRenameMap(variable.getAttributeName());
-            }
 
-            if(variableName == null)
-                variableName = variable.getAttributeName(); //This for safety. sort of Hack
+        variableName +="." + variable.getAttributeName();
+//
+//        if(variable.getStreamId() != null){
+//
+//
+//        }
+//        else{
+//
+//        }
 
-        }
+//        if(variable.getStreamId() != null){
+//
+//          if(siddhiHiveManager.getWindowProcessingState() == WindowProcessingState.WINDOW_PROCESSED){
+//
+//              ProcessingMode processingMode = siddhiHiveManager.getProcessingMode();
+//              if(processingMode == ProcessingMode.SELECTOR){
+//                  variableName = siddhiHiveManager.getCachedValues(variable.getStreamId());
+//              }
+//
+//          }
+//          else if(siddhiHiveManager.getWindowProcessingState() == WindowProcessingState.WINDOW_PROCESSING){
+//
+//              ProcessingMode processingMode = siddhiHiveManager.getProcessingMode();
+//              if(processingMode == ProcessingMode.SELECTOR_WHERE){
+//                  variableName = siddhiHiveManager.getCachedValues(variable.getStreamId());
+//              }
+//          }
+//          else{
+//                if (siddhiHiveManager.getStreamReferenceID(variable.getStreamId()) != null ){
+//                    variableName =  siddhiHiveManager.getStreamReferenceID(variable.getStreamId());
+//                }
+//                else {
+//                    variableName = variable.getStreamId();
+//                }
+//            }
+//
+//            variableName += "."  ;
+//            variableName += variable.getAttributeName();
+//        }
+//        else{
+//            //if this is a having condition mode operator with null streamID
+//            if (siddhiHiveManager.getProcessingMode() == ProcessingMode.SELECTOR_HAVING){
+//                variableName = siddhiHiveManager.getSelectionAttributeRenameMap(variable.getAttributeName());
+//            }
+//
+//            if(variableName == null)
+//                variableName = variable.getAttributeName(); //This for safety. sort of Hack
+//
+//        }
 
         return variableName;
     }

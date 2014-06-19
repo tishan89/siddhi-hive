@@ -24,10 +24,13 @@ public class WindowStreamHandler extends BasicStreamHandler {
         if (type.equals(Constants.TIME_WINDOW) || type.equals(Constants.TIME_BATCH_WINDOW)) {
             TimeWindowStreamHandler timeWindowStreamHandler = new TimeWindowStreamHandler(getSiddhiHiveManager());
             return timeWindowStreamHandler.process(windowStream, streamDefinitions);
-        } else if (type.equals(Constants.LENGTH_WINDOW) || type.equals(Constants.LENGTH_BATCH_WINDOW)) {
+        } else if (type.equals(Constants.LENGTH_WINDOW)) {
             LengthWindowStreamHandler lengthWindowStreamHandler = new LengthWindowStreamHandler(getSiddhiHiveManager());
             return lengthWindowStreamHandler.process(windowStream, streamDefinitions);
+        }else if(type.equals(Constants.LENGTH_BATCH_WINDOW)){
+
         }
+
         return null;
     }
 

@@ -9,6 +9,7 @@ import org.wso2.carbon.siddhihive.core.selectorprocessor.QuerySelectorProcessor;
 import org.wso2.carbon.siddhihive.core.tablecreation.CassandraTableCreator;
 import org.wso2.carbon.siddhihive.core.tablecreation.TableCreatorBase;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
+import org.wso2.carbon.siddhihive.core.utils.LengthWndStreamInfoHolder;
 import org.wso2.carbon.siddhihive.core.utils.ProcessingMode;
 import org.wso2.carbon.siddhihive.core.utils.WindowProcessingState;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
@@ -40,10 +41,15 @@ public class SiddhiHiveManager {
     private ProcessingMode processingMode;
     private WindowProcessingState windowProcessingState;
 
+   // private Map<String, LengthWndStreamInfoHolder> lengthWndStreamInfoHolderMap = null;
 
-    private ConcurrentMap<String, String> selectionAttributeRenameMap = null;
+    private int subqueryCounter = 0;
 
-   public SiddhiHiveManager() {
+    private Map<String, String> selectionAttributeRenameMap = null;
+
+
+
+    public SiddhiHiveManager() {
         streamDefinitionMap = new ConcurrentHashMap<String, StreamDefinitionExt>();
         //New Query Map
         queryMap = new ConcurrentHashMap<String, String>();
@@ -53,6 +59,9 @@ public class SiddhiHiveManager {
         selectionAttributeRenameMap = new ConcurrentHashMap<String, String>();
 
         windowProcessingState = WindowProcessingState.NONE;
+
+
+     //  lengthWndStreamInfoHolderMap = new ConcurrentHashMap<String, LengthWndStreamInfoHolder>();
     }
 
     public Map<String, StreamDefinitionExt> getStreamDefinitionMap() {
@@ -112,6 +121,21 @@ public class SiddhiHiveManager {
         }
         return null;
     }
+
+    public String generateSubQueryIdentifier(){
+
+        String subQueryIdentifier = "subq" + String.valueOf(++subqueryCounter);
+
+        return subQueryIdentifier;
+    }
+
+//    public LengthWndStreamInfoHolder getLengthWndStreamInfoHolder(String key) {
+//        return lengthWndStreamInfoHolderMap.get(key);
+//    }
+//
+//    public void setLengthWndStreamInfoHolder(String key, LengthWndStreamInfoHolder lengthWndStreamInfoHolder) {
+//        this.lengthWndStreamInfoHolderMap.put(key, lengthWndStreamInfoHolder);
+//    }
 
     public String getSelectionAttributeRenameMap(String rename) {
         return this.selectionAttributeRenameMap.get(rename);
