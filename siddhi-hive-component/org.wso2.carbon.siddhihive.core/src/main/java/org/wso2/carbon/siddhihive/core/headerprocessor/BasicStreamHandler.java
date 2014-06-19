@@ -5,8 +5,6 @@ import org.wso2.carbon.siddhihive.core.handler.ConditionHandler;
 import org.wso2.carbon.siddhihive.core.configurations.StreamDefinitionExt;
 import org.wso2.carbon.siddhihive.core.internal.SiddhiHiveManager;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
-import org.wso2.carbon.siddhihive.core.utils.ProcessingMode;
-import org.wso2.carbon.siddhihive.core.utils.WindowProcessingState;
 import org.wso2.siddhi.query.api.query.input.BasicStream;
 import org.wso2.siddhi.query.api.query.input.Stream;
 import org.wso2.siddhi.query.api.query.input.handler.Filter;
@@ -22,10 +20,12 @@ public class BasicStreamHandler implements StreamHandler {
     private Map<String, String> result;
     private SiddhiHiveManager siddhiHiveManager;
 
+
+
     public BasicStreamHandler(SiddhiHiveManager siddhiHiveManagerParam){
 
         this.siddhiHiveManager = siddhiHiveManagerParam;
-        this.siddhiHiveManager.setWindowProcessingState(WindowProcessingState.WINDOW_PROCESSING);
+        //this.siddhiHiveManager.setWindowProcessingState(WindowProcessingState.WINDOW_PROCESSING);
     }
 
     @Override
@@ -59,7 +59,7 @@ public String generateWhereClause(Filter filter) {
         return siddhiHiveManager;
     }
 
-    public void addStreamReference(String referenceID, String streamID){
-        getSiddhiHiveManager().setInputStreamReferenceID(referenceID, streamID);
-    }
+//    public void addStreamReference(String referenceID, String streamID){
+//        getSiddhiHiveManager().setInputStreamReferenceID(referenceID, streamID);
+//    }
 }

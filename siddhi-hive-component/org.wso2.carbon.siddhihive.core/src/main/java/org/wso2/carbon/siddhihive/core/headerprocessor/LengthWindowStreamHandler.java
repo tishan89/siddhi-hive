@@ -1,19 +1,18 @@
 package org.wso2.carbon.siddhihive.core.headerprocessor;
 
 import org.wso2.carbon.siddhihive.core.configurations.StreamDefinitionExt;
+import org.wso2.carbon.siddhihive.core.handler.ConditionHandler;
 import org.wso2.carbon.siddhihive.core.internal.SiddhiHiveManager;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
-import org.wso2.carbon.siddhihive.core.utils.LengthWndStreamInfoHolder;
-import org.wso2.carbon.siddhihive.core.utils.ProcessingMode;
-import org.wso2.carbon.siddhihive.core.utils.WindowProcessingState;
-import org.wso2.siddhi.query.api.condition.Condition;
+import org.wso2.carbon.siddhihive.core.utils.enums.ProcessingLevel;
+import org.wso2.carbon.siddhihive.core.utils.enums.WindowProcessingLevel;
+import org.wso2.carbon.siddhihive.core.utils.enums.WindowStreamProcessingLevel;
 import org.wso2.siddhi.query.api.definition.Attribute;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.expression.Expression;
 import org.wso2.siddhi.query.api.expression.constant.IntConstant;
 import org.wso2.siddhi.query.api.query.input.Stream;
 import org.wso2.siddhi.query.api.query.input.WindowStream;
-import org.wso2.siddhi.query.api.query.input.handler.Window;
 import org.wso2.siddhi.query.api.query.input.handler.Filter;
 
 import java.util.ArrayList;
@@ -48,28 +47,17 @@ public class LengthWindowStreamHandler extends WindowStreamHandler {
     public Map<String, String> process(Stream stream, Map<String, StreamDefinitionExt> streamDefinitions){
 
         this.windowStream = (WindowStream) stream;
-        addStreamReference(this.windowStream.getStreamReferenceId(), this.windowStream.getStreamId());
-
-
-        String type = windowStream.getWindow().getName();
-
-
+        initializeWndVariables();
         selectParamsClause = generateWindowSelectClause(); //SELECT     StockExchangeStream.symbol  , StockExchangeStream.price , StockExchangeStream.timestamps
         limitClause = generateLimitLength();
 
+        invokeGenerateWhereClause(windowStream.getFilter()); //where   A.symbol   =   "IBM"
 
-        setSubQueryIdentifier();
-        getSiddhiHiveManager().setProcessingMode(ProcessingMode.SELECTOR_WHERE);
-        getSiddhiHiveManager().addCachedValues("STREAM_ID", wndSubQueryIdentifier);
-        whereClause = generateWhereClause(windowStream.getFilter()); //where   A.symbol   =   "IBM"
-        getSiddhiHiveManager().removedCachedValues("STREAM_ID");
-        getSiddhiHiveManager().setProcessingMode(ProcessingMode.INPUT_STREAM);
         fromClause = assembleWindowFromClause(); //  from
         result = new HashMap<String, String>();
         result.put(Constants.LENGTH_WIND_FROM_QUERY, fromClause);
 
-        getSiddhiHiveManager().setWindowProcessingState(WindowProcessingState.WINDOW_PROCESSED);
-
+        finalizeWndVariable();
         return result;
     }
 
@@ -82,42 +70,39 @@ public class LengthWindowStreamHandler extends WindowStreamHandler {
                "\n" + " " + whereClause + "  ";
     }
 
-//    private String generateSubQueryIdentifier(boolean generateID){
-//
-//        String subQueryIdentifier = "subq";
-//
-//        if(generateID)
-//            subQueryIdentifier += String.valueOf(++subqueryCounter);
-//        else
-//            subQueryIdentifier += String.valueOf(subqueryCounter);
-//
-//        return subQueryIdentifier;
-//    }
-
-    private void setSubQueryIdentifier(){
+    private void initializeWndVariables(){
 
 
-        if(wndSubQueryIdentifier == null){
-            String streamReferenceID = this.windowStream.getStreamReferenceId();
-            String streamID =  this.windowStream.getStreamId();
+        String streamReferenceID = this.windowStream.getStreamReferenceId();
+        String streamID =  this.windowStream.getStreamId();
 
-            if( streamID.equalsIgnoreCase(streamReferenceID))
-                wndSubQueryIdentifier =  getSiddhiHiveManager().generateSubQueryIdentifier();
-            else
-                wndSubQueryIdentifier = streamReferenceID;
+        if( streamID.equalsIgnoreCase(streamReferenceID))
+            wndSubQueryIdentifier =  getSiddhiHiveManager().generateSubQueryIdentifier();
+        else
+            wndSubQueryIdentifier = streamReferenceID;
 
-            getSiddhiHiveManager().addStreamGeneratedQueryID(streamReferenceID,wndSubQueryIdentifier);
-            getSiddhiHiveManager().addCachedValues(this.windowStream.getStreamId(), wndSubQueryIdentifier);
-        }
+        getSiddhiHiveManager().addStreamGeneratedQueryID(streamReferenceID,wndSubQueryIdentifier);
+        //getSiddhiHiveManager().addCachedValues(this.windowStream.getStreamId(), wndSubQueryIdentifier);
+        getSiddhiHiveManager().addCachedValues("STREAM_ID", wndSubQueryIdentifier);
 
-//        LengthWndStreamInfoHolder lengthWndStreamInfoHolder = new LengthWndStreamInfoHolder();
+        getSiddhiHiveManager().setWindowStreamProcessingLevel(WindowStreamProcessingLevel.LENGTH_WINDOW_PROCESSING);
+
+
+//        LengthWndStreamInfo
+// .Holder lengthWndStreamInfoHolder = new LengthWndStreamInfoHolder();
 //        lengthWndStreamInfoHolder.setStreamReferenceID(streamReferenceID);
-//        lengthWndStreamInfoHolder.setSubQueryIdentifier(subQueryIdentifier);
+//        lengthWndStreamInfoHolder.initializeWndVariables(subQueryIdentifier);
 //        lengthWndStreamInfoHolder.setStreamID(streamID);
 //        getSiddhiHiveManager().setLengthWndStreamInfoHolder(streamReferenceID, lengthWndStreamInfoHolder);
 
 
        // return subQueryIdentifier;
+    }
+
+    private void finalizeWndVariable(){
+
+        getSiddhiHiveManager().setWindowStreamProcessingLevel(WindowStreamProcessingLevel.NONE);
+        getSiddhiHiveManager().setWindowProcessingLevel(WindowProcessingLevel.NONE);
     }
 
     private String generateWindowSelectClause(){
@@ -161,21 +146,14 @@ public class LengthWindowStreamHandler extends WindowStreamHandler {
         return Constants.ORDER_BY + "  " + String.valueOf(length);
     }
 
-//    private void modifyObjects(Object object){
-//
-//
-//        if(object instanceof  Filter){
-//
-//            Filter filter = (Filter)object;
-//
-//            Condition condition = filter.getFilterCondition();
-//
-//            if( condition != null){
-//
-//                condition
-//            }
-//        }
-//
-//    }
+
+    public void invokeGenerateWhereClause(Filter filter) {
+
+       getSiddhiHiveManager().setWindowProcessingLevel(WindowProcessingLevel.WND_WHERE_PROCESSING);
+       whereClause = generateWhereClause(filter);
+       getSiddhiHiveManager().setWindowProcessingLevel(WindowProcessingLevel.NONE);
 
     }
+
+
+}

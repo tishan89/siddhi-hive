@@ -2,8 +2,10 @@ package org.wso2.carbon.siddhihive.core.handler;
 
 import org.wso2.carbon.siddhihive.core.internal.SiddhiHiveManager;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
-import org.wso2.carbon.siddhihive.core.utils.ProcessingMode;
-import org.wso2.carbon.siddhihive.core.utils.WindowProcessingState;
+import org.wso2.carbon.siddhihive.core.utils.enums.InputStreamProcessingLevel;
+import org.wso2.carbon.siddhihive.core.utils.enums.ProcessingLevel;
+import org.wso2.carbon.siddhihive.core.utils.enums.SelectorProcessingLevel;
+import org.wso2.carbon.siddhihive.core.utils.enums.WindowProcessingLevel;
 import org.wso2.siddhi.query.api.condition.*;
 import org.wso2.siddhi.query.api.expression.Expression;
 import org.wso2.siddhi.query.api.expression.Multiply;
@@ -105,28 +107,54 @@ public class ConditionHandler {
         String variableName ="";
         String streamID = "";
 
-        if ( siddhiHiveManager.getProcessingMode() == ProcessingMode.SELECTOR_HAVING){
-            variableName = siddhiHiveManager.getSelectionAttributeRenameMap(variable.getAttributeName());
-        }
-        else{
+        if( (siddhiHiveManager.getProcessingLevel() == ProcessingLevel.SELECTOR) && (siddhiHiveManager.getSelectorProcessingLevel() == SelectorProcessingLevel.HAVING) ){
+
+                variableName = siddhiHiveManager.getSelectionAttributeRenameMap(variable.getAttributeName());
+
+                if (variableName == null)
+                    variableName = variable.getAttributeName();
+
+        }else{
+
             if(siddhiHiveManager.getCachedValues("STREAM_ID") != null )
                 streamID = siddhiHiveManager.getCachedValues("STREAM_ID");
 
             if(streamID.isEmpty() == false){
-                variableName = streamID;
+                variableName = streamID + ".";
             }else{
 
                 if(variable.getStreamId() != null){
                     variableName = variable.getStreamId();
                     variableName +=".";
                 }
-                variableName += variable.getAttributeName();
             }
+
+            variableName += variable.getAttributeName();
         }
 
-        if (variableName == null){
-            variableName = variable.getAttributeName();
-        }
+//
+//        if ( siddhiHiveManager.getProcessingLevel() == ProcessingLevel.SELECTOR_HAVING){
+//            variableName = siddhiHiveManager.getSelectionAttributeRenameMap(variable.getAttributeName());
+//        }
+//        else{
+//            if(siddhiHiveManager.getCachedValues("STREAM_ID") != null )
+//                streamID = siddhiHiveManager.getCachedValues("STREAM_ID");
+//
+//            if(streamID.isEmpty() == false){
+//                variableName = streamID;
+//            }else{
+//
+//                if(variable.getStreamId() != null){
+//                    variableName = variable.getStreamId();
+//                    variableName +=".";
+//                }
+//                variableName += variable.getAttributeName();
+//            }
+//        }
+//
+//        if (variableName == null){
+//            variableName = variable.getAttributeName();
+//        }
 
 //
 //        if(variable.getStreamId() != null){
@@ -141,16 +169,16 @@ public class ConditionHandler {
 //
 //          if(siddhiHiveManager.getWindowProcessingState() == WindowProcessingState.WINDOW_PROCESSED){
 //
-//              ProcessingMode processingMode = siddhiHiveManager.getProcessingMode();
-//              if(processingMode == ProcessingMode.SELECTOR){
+//              ProcessingLevel processingMode = siddhiHiveManager.getProcessingLevel();
+//              if(processingMode == ProcessingLevel.SELECTOR){
 //                  variableName = siddhiHiveManager.getCachedValues(variable.getStreamId());
 //              }
 //
 //          }
 //          else if(siddhiHiveManager.getWindowProcessingState() == WindowProcessingState.WINDOW_PROCESSING){
 //
-//              ProcessingMode processingMode = siddhiHiveManager.getProcessingMode();
-//              if(processingMode == ProcessingMode.SELECTOR_WHERE){
+//              ProcessingLevel processingMode = siddhiHiveManager.getProcessingLevel();
+//              if(processingMode == ProcessingLevel.SELECTOR_WHERE){
 //                  variableName = siddhiHiveManager.getCachedValues(variable.getStreamId());
 //              }
 //          }
@@ -168,7 +196,7 @@ public class ConditionHandler {
 //        }
 //        else{
 //            //if this is a having condition mode operator with null streamID
-//            if (siddhiHiveManager.getProcessingMode() == ProcessingMode.SELECTOR_HAVING){
+//            if (siddhiHiveManager.getProcessingLevel() == ProcessingLevel.SELECTOR_HAVING){
 //
 //            }
 //

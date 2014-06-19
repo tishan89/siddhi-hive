@@ -58,8 +58,8 @@ public final class Constants {
     public static final String DEFAULT_SLIDING_FREQUENCY = "600";
     public static final String LENGTH_WINDOW = "length";
     public static final String LENGTH_BATCH_WINDOW = "lengthBatch";
-
-    public static final String ORDER_BY = " ORDER BY timestamps DESC LIMIT ";
+    public static final String INITALIZATION_SCRIPT= "initialization_Script";
+    public static final String ORDER_BY = " ORDER BY ";
     public static final String SELECT = " SELECT ";
     public static final String TIMESTAMPS_COLUMN = "timestamps";
 
