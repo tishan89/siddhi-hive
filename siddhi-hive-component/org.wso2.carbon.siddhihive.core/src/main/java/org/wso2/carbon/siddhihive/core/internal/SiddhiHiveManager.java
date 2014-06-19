@@ -9,7 +9,6 @@ import org.wso2.carbon.siddhihive.core.selectorprocessor.QuerySelectorProcessor;
 import org.wso2.carbon.siddhihive.core.tablecreation.CassandraTableCreator;
 import org.wso2.carbon.siddhihive.core.tablecreation.TableCreatorBase;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
-import org.wso2.carbon.siddhihive.core.utils.LengthWndStreamInfoHolder;
 import org.wso2.carbon.siddhihive.core.utils.ProcessingMode;
 import org.wso2.carbon.siddhihive.core.utils.WindowProcessingState;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
@@ -47,6 +46,7 @@ public class SiddhiHiveManager {
 
     private Map<String, String> selectionAttributeRenameMap = null;
 
+    private Boolean isScheduled = false;
 
 
     public SiddhiHiveManager() {
@@ -221,7 +221,10 @@ public class SiddhiHiveManager {
             inputCreate += arrCreate[j];
             inputCreate += "\n";
         }
-
+        if (headerMap.get(Constants.TIME_WINDOW_FREQUENCY) != null && isScheduled == false) {
+            isScheduled = true;
+            //Configure Scheduling
+        }
 
         String fromClause = headerMap.get(Constants.FROM_CLAUSE);
         if(fromClause == null)
