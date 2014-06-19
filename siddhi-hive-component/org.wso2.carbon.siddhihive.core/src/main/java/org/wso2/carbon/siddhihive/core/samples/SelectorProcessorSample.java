@@ -44,19 +44,18 @@ public class SelectorProcessorSample {
 //        select *
 //                insert into JoinStream
 
-//        from StockExchangeStream#window.time(1 min)
-//        " +
-//        "select symbol,price, avg(price) as averagePrice \n" +
-//                "group by symbol, price  \n" +
-//                "having ((price > averagePrice*1.02) and (averagePrice*0.98 > price ))\n" +
-//                "insert into FastMovingStockQuotes;
+        String queryID = siddhiManager.addQuery(" from StockExchangeStream[symbol == \"IBM\"]#window.time(1 min)" +
+        "select symbol,price, avg(price) as averagePrice \n" +
+                "group by symbol, price  \n" +
+                "having ((price > averagePrice*1.02) and (averagePrice*0.98 > price ))\n" +
+                "insert into FastMovingStockQuotes");
 
         System.out.println("+++++++++++++++++++++++++++");
-        String queryID = siddhiManager.addQuery(" from StockExchangeStream[symbol == \"IBM\"]#window.length(1)\n" +
-                "select symbol,price, avg(price) as averagePrice \n" +
-                "group by symbol\n" +
-                "having ((price > averagePrice*1.02) and ( (averagePrice*0.98 > price) or (averagePrice*0.98 < price) ))\n" +
-                "insert into FastMovingStockQuotes;");
+//        String queryID = siddhiManager.addQuery(" from StockExchangeStream[symbol == \"IBM\"]#window.length(1)\n" +
+//                "select symbol,price, avg(price) as averagePrice \n" +
+//                "group by symbol\n" +
+//                "having ((price > averagePrice*1.02) and ( (averagePrice*0.98 > price) or (averagePrice*0.98 < price) ))\n" +
+//                "insert into FastMovingStockQuotes;");
 
 
 

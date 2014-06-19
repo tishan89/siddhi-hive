@@ -7,7 +7,8 @@ public enum ProcessingMode {
     INPUT_STREAM(1),
     SELECTOR(2),
     SELECTOR_HAVING(3),
-    OUTPUT_STREAM(4);
+    SELECTOR_WHERE(4),
+    OUTPUT_STREAM(5);
 
     private int code;
 
