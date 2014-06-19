@@ -105,20 +105,29 @@ public class ConditionHandler {
         String variableName ="";
         String streamID = "";
 
-        if(siddhiHiveManager.getCachedValues("STREAM_ID") != null )
-            streamID = siddhiHiveManager.getCachedValues("STREAM_ID");
+        if ( siddhiHiveManager.getProcessingMode() == ProcessingMode.SELECTOR_HAVING){
+            variableName = siddhiHiveManager.getSelectionAttributeRenameMap(variable.getAttributeName());
+        }
+        else{
+            if(siddhiHiveManager.getCachedValues("STREAM_ID") != null )
+                streamID = siddhiHiveManager.getCachedValues("STREAM_ID");
 
-        if(streamID.isEmpty() == false){
-            variableName = streamID;
-        }else{
+            if(streamID.isEmpty() == false){
+                variableName = streamID;
+            }else{
 
-            if(variable.getStreamId() != null){
-
-                variableName = variable.getStreamId();
+                if(variable.getStreamId() != null){
+                    variableName = variable.getStreamId();
+                    variableName +=".";
+                }
+                variableName += variable.getAttributeName();
             }
         }
 
-        variableName +="." + variable.getAttributeName();
+        if (variableName == null){
+            variableName = variable.getAttributeName();
+        }
+
 //
 //        if(variable.getStreamId() != null){
 //
@@ -160,7 +169,7 @@ public class ConditionHandler {
 //        else{
 //            //if this is a having condition mode operator with null streamID
 //            if (siddhiHiveManager.getProcessingMode() == ProcessingMode.SELECTOR_HAVING){
-//                variableName = siddhiHiveManager.getSelectionAttributeRenameMap(variable.getAttributeName());
+//
 //            }
 //
 //            if(variableName == null)
