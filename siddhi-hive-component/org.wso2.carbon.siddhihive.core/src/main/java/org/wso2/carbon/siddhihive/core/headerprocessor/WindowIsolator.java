@@ -52,7 +52,13 @@ public class WindowIsolator {
     private void populateForTimeWindow(Window window) {
         propertyMap = new HashMap<String, String>();
         long currentTime = System.currentTimeMillis();
-        long duration = (long) ((LongConstant) window.getParameters()[0]).getValue();
+        long duration = 0;
+        if (window.getParameters()[0] instanceof LongConstant) {
+            duration = ((LongConstant) window.getParameters()[0]).getValue();
+        } else if (window.getParameters()[0] instanceof IntConstant) {
+            duration = (long) (((IntConstant) window.getParameters()[0]).getValue());
+        }
+        //long duration = (long) ((LongConstant) window.getParameters()[0]).getValue();
         long toTime = currentTime + duration;
         propertyMap.put(Constants.FROM_TIME, String.valueOf(currentTime));
         propertyMap.put(Constants.TO_TIME, String.valueOf(toTime));
