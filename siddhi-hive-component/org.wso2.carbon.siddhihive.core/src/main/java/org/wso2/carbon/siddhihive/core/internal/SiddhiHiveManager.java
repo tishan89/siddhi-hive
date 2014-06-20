@@ -9,8 +9,7 @@ import org.wso2.carbon.siddhihive.core.selectorprocessor.QuerySelectorProcessor;
 import org.wso2.carbon.siddhihive.core.tablecreation.CassandraTableCreator;
 import org.wso2.carbon.siddhihive.core.tablecreation.TableCreatorBase;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
-import org.wso2.carbon.siddhihive.core.utils.ProcessingMode;
-import org.wso2.carbon.siddhihive.core.utils.WindowProcessingState;
+import org.wso2.carbon.siddhihive.core.utils.enums.*;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.query.Query;
 import org.wso2.siddhi.query.api.query.input.Stream;
@@ -33,38 +32,44 @@ public class SiddhiHiveManager {
     private static final Logger log = Logger.getLogger(SiddhiHiveManager.class);
 
     private Map<String, StreamDefinitionExt> streamDefinitionMap= null; //contains stream definition
-    private Map<String, String> queryMap= null;
-    private Map<String, String> inputStreamReferenceIDMap= null;// map to maintain both the stream ID and stream reference ID
+   // private Map<String, String> queryMap= null;
+    //private Map<String, String> inputStreamReferenceIDMap= null;// map to maintain both the stream ID and stream reference ID
 
     private Map<String, String> cachedValuesMap= null; //parent refernce
     private Map<String, String> inputStreamGeneratedQueryMap= null; // reference ID <-----> Replacement generatedQueryID
 
-    private ProcessingMode processingMode;
-    private WindowProcessingState windowProcessingState;
-
-   // private Map<String, LengthWndStreamInfoHolder> lengthWndStreamInfoHolderMap = null;
+    private ProcessingLevel processingLevel;
+    private InputStreamProcessingLevel inputStreamProcessingLevel ;
+    private SelectorProcessingLevel selectorProcessingLevel;
+    private WindowStreamProcessingLevel windowStreamProcessingLevel;
+    private WindowProcessingLevel windowProcessingLevel;
 
     private int subqueryCounter = 0;
 
     private Map<String, String> selectionAttributeRenameMap = null;
 
+    private Map<String, String> referenceIDAliasMap = null;
     private Boolean isScheduled = false;
     private Query query;
+
 
 
     public SiddhiHiveManager() {
         streamDefinitionMap = new ConcurrentHashMap<String, StreamDefinitionExt>();
         //New Query Map
-        queryMap = new ConcurrentHashMap<String, String>();
-        inputStreamReferenceIDMap = new ConcurrentHashMap<String, String>();
+       // queryMap = new ConcurrentHashMap<String, String>();
+        //inputStreamReferenceIDMap = new ConcurrentHashMap<String, String>();
         cachedValuesMap = new ConcurrentHashMap<String, String>();
         inputStreamGeneratedQueryMap =  new ConcurrentHashMap<String, String>();
         selectionAttributeRenameMap = new ConcurrentHashMap<String, String>();
+        referenceIDAliasMap = new ConcurrentHashMap<String, String>();
 
-        windowProcessingState = WindowProcessingState.NONE;
+        processingLevel = ProcessingLevel.NONE;
+        inputStreamProcessingLevel = InputStreamProcessingLevel.NONE;
+        selectorProcessingLevel = SelectorProcessingLevel.NONE;
+        windowStreamProcessingLevel = WindowStreamProcessingLevel.NONE;
+        windowProcessingLevel = WindowProcessingLevel.NONE;
 
-
-     //  lengthWndStreamInfoHolderMap = new ConcurrentHashMap<String, LengthWndStreamInfoHolder>();
     }
 
     public Map<String, StreamDefinitionExt> getStreamDefinitionMap() {
@@ -85,15 +90,15 @@ public class SiddhiHiveManager {
         }
     }
 
-    public String getStreamReferenceID(String referenceID) {
-
-        String streamID = inputStreamReferenceIDMap.get(referenceID);
-
-        if(  streamID != null)
-            return streamID;
-
-        return null;
-    }
+//    public String getStreamReferenceID(String referenceID) {
+//
+//        String streamID = inputStreamReferenceIDMap.get(referenceID);
+//
+//        if(  streamID != null)
+//            return streamID;
+//
+//        return null;
+//    }
 
     public String getStreamGeneratedQueryID(String referenceID){
         return inputStreamGeneratedQueryMap.get(referenceID);
@@ -103,9 +108,9 @@ public class SiddhiHiveManager {
          inputStreamGeneratedQueryMap.put(referenceID, streamGeneratedQueryID);
     }
 
-    public void setInputStreamReferenceID(String referenceID, String streamID) {
-        this.inputStreamReferenceIDMap.put(referenceID, streamID);
-    }
+//    public void setInputStreamReferenceID(String referenceID, String streamID) {
+//        this.inputStreamReferenceIDMap.put(referenceID, streamID);
+//    }
 
     public void addCachedValues(String cachedID, String cachedValue) {
         this.cachedValuesMap.put(cachedID,cachedValue);
@@ -132,14 +137,6 @@ public class SiddhiHiveManager {
         return subQueryIdentifier;
     }
 
-//    public LengthWndStreamInfoHolder getLengthWndStreamInfoHolder(String key) {
-//        return lengthWndStreamInfoHolderMap.get(key);
-//    }
-//
-//    public void setLengthWndStreamInfoHolder(String key, LengthWndStreamInfoHolder lengthWndStreamInfoHolder) {
-//        this.lengthWndStreamInfoHolderMap.put(key, lengthWndStreamInfoHolder);
-//    }
-
     public String getSelectionAttributeRenameMap(String rename) {
         return this.selectionAttributeRenameMap.get(rename);
     }
@@ -148,24 +145,64 @@ public class SiddhiHiveManager {
         this.selectionAttributeRenameMap.put(rename, selectionString);
     }
 
-    public ProcessingMode getProcessingMode() {
-        return processingMode;
+    public ProcessingLevel getProcessingLevel() {
+        return processingLevel;
     }
 
-    public void setProcessingMode(ProcessingMode processingMode) {
-        this.processingMode = processingMode;
+    public void setProcessingLevel(ProcessingLevel processingLevel) {
+
+
+
+        this.processingLevel = processingLevel;
     }
 
-    public WindowProcessingState getWindowProcessingState() {
-        return windowProcessingState;
+
+    public SelectorProcessingLevel getSelectorProcessingLevel() {
+        return selectorProcessingLevel;
     }
 
-    public void setWindowProcessingState(WindowProcessingState windowProcessingState) {
-        this.windowProcessingState = windowProcessingState;
+    public void setSelectorProcessingLevel(SelectorProcessingLevel selectorProcessingLevel) {
+        this.selectorProcessingLevel = selectorProcessingLevel;
+    }
+
+    public InputStreamProcessingLevel getInputStreamProcessingLevel() {
+        return inputStreamProcessingLevel;
+    }
+
+    public void setInputStreamProcessingLevel(InputStreamProcessingLevel inputStreamProcessingLevel) {
+        this.inputStreamProcessingLevel = inputStreamProcessingLevel;
+    }
+
+    public WindowStreamProcessingLevel getWindowStreamProcessingLevel() {
+        return windowStreamProcessingLevel;
+    }
+
+    public void setWindowStreamProcessingLevel(WindowStreamProcessingLevel windowStreamProcessingLevel) {
+        this.windowStreamProcessingLevel = windowStreamProcessingLevel;
+    }
+
+    public WindowProcessingLevel getWindowProcessingLevel() {
+        return windowProcessingLevel;
+    }
+
+    public void setWindowProcessingLevel(WindowProcessingLevel windowProcessingLevel) {
+        this.windowProcessingLevel = windowProcessingLevel;
     }
 
     public void removedCachedValues(String cachedID) {
+
         this.cachedValuesMap.remove(cachedID);
+    }
+
+    public String getReferenceIDAlias(String referenceID) {
+
+        String alias = referenceIDAliasMap.get(referenceID);
+
+        return alias;
+    }
+
+    public void setReferenceIDAlias(String referenceID, String alias) {
+        this.referenceIDAliasMap.put(referenceID, alias);
     }
 
     public void setSiddhiStreamDefinition(List<StreamDefinition> streamDefinitionList) {
@@ -189,17 +226,17 @@ public class SiddhiHiveManager {
 
         String hiveQuery = "";
 
-        setProcessingMode(ProcessingMode.INPUT_STREAM.INPUT_STREAM);
+        setProcessingLevel(org.wso2.carbon.siddhihive.core.utils.enums.ProcessingLevel.INPUT_STREAM);
         HeaderHandler headerHandler = new HeaderHandler(this);
         Map<String, String> headerMap = headerHandler.process(query.getInputStream(), this.getStreamDefinitionMap());
 
 
-        setProcessingMode(ProcessingMode.INPUT_STREAM.SELECTOR);
+        setProcessingLevel(org.wso2.carbon.siddhihive.core.utils.enums.ProcessingLevel.INPUT_STREAM.SELECTOR);
         QuerySelectorProcessor querySelectorProcessor = new QuerySelectorProcessor(this);
         querySelectorProcessor.handleSelector(query.getSelector());
         ConcurrentMap<String, String> concurrentSelectorMap = querySelectorProcessor.getSelectorQueryMap();
 
-        setProcessingMode(ProcessingMode.OUTPUT_STREAM);
+        setProcessingLevel(org.wso2.carbon.siddhihive.core.utils.enums.ProcessingLevel.OUTPUT_STREAM);
         OutStream outStream = query.getOutputStream();
         StreamDefinitionExt outStreamDefinition = getStreamDefinition(outStream.getStreamId());
         TableCreatorBase tableCreator = new CSVTableCreator();
@@ -233,11 +270,17 @@ public class SiddhiHiveManager {
             schedule(Long.valueOf(headerMap.get(Constants.LENGTH_WINDOW_FREQUENCY)).longValue());
         }
 
+
         String fromClause = headerMap.get(Constants.FROM_CLAUSE);
         if(fromClause == null)
             fromClause = headerMap.get(Constants.LENGTH_WIND_FROM_QUERY);
         if(fromClause == null)
             fromClause = headerMap.get(Constants.JOIN_CLAUSE);
+
+        String initializationScript = headerMap.get(Constants.INITALIZATION_SCRIPT);
+
+        if(initializationScript == null)
+            initializationScript = " ";
 
         String selectQuery = "SELECT " + concurrentSelectorMap.get(Constants.SELECTION_QUERY);
         String groupByQuery = concurrentSelectorMap.get(Constants.GROUP_BY_QUERY);
@@ -261,7 +304,7 @@ public class SiddhiHiveManager {
             incrementalClause = " ";
 
        // hiveQuery = outputQuery + "\n" + incrementalClause + "\n" + fromClause + "\n " + selectQuery + "\n " + groupByQuery + "\n " + havingQuery + "\n " + whereClause + "\n ";
-        hiveQuery = inputCreate + "\n" + outputCreate +"\n" +outputInsertQuery + "\n" + incrementalClause + "\n" + selectQuery + "\n " + fromClause + "\n " +whereClause + "\n " + groupByQuery + "\n " + havingQuery + "\n ";
+        hiveQuery = inputCreate + "\n" + outputCreate +"\n" +outputInsertQuery + "\n" + incrementalClause + "\n" + initializationScript + "\n" + selectQuery + "\n " + fromClause + "\n " +whereClause + "\n " + groupByQuery + "\n " + havingQuery + "\n ";
 
         return hiveQuery;
 

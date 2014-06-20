@@ -1,18 +1,17 @@
-package org.wso2.carbon.siddhihive.core.utils;
+package org.wso2.carbon.siddhihive.core.utils.enums;
 
 /**
  * Created by firzhan on 6/18/14.
  */
-public enum ProcessingMode {
+public enum ProcessingLevel {
     INPUT_STREAM(1),
     SELECTOR(2),
-    SELECTOR_HAVING(3),
-    SELECTOR_WHERE(4),
-    OUTPUT_STREAM(5);
+    OUTPUT_STREAM(5),
+    NONE(6);
 
     private int code;
 
-    private ProcessingMode(int c) {
+    private ProcessingLevel(int c) {
         code = c;
     }
 

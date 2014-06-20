@@ -8,7 +8,10 @@ import org.wso2.carbon.siddhihive.core.handler.AttributeHandler;
 import org.wso2.carbon.siddhihive.core.handler.ConditionHandler;
 import org.wso2.carbon.siddhihive.core.internal.SiddhiHiveManager;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
-import org.wso2.carbon.siddhihive.core.utils.ProcessingMode;
+import org.wso2.carbon.siddhihive.core.utils.enums.InputStreamProcessingLevel;
+import org.wso2.carbon.siddhihive.core.utils.enums.ProcessingLevel;
+import org.wso2.carbon.siddhihive.core.utils.enums.SelectorProcessingLevel;
+import org.wso2.carbon.siddhihive.core.utils.enums.WindowProcessingLevel;
 import org.wso2.siddhi.query.api.condition.AndCondition;
 import org.wso2.siddhi.query.api.condition.Condition;
 import org.wso2.siddhi.query.api.condition.OrCondition;
@@ -49,6 +52,7 @@ public class QuerySelectorProcessor {
         simpleAttributeList = new ArrayList<SimpleAttribute>();
 
         selectionStringMap = new ConcurrentHashMap<String, String>();
+
     }
 
     public boolean handleSelector(Selector selector) {
@@ -66,6 +70,9 @@ public class QuerySelectorProcessor {
         selectorQueryMap.put(Constants.GROUP_BY_QUERY, groupByQuery);
         selectorQueryMap.put(Constants.HAVING_QUERY, handle);
 
+        siddhiHiveManager.setSelectorProcessingLevel(SelectorProcessingLevel.NONE);
+        siddhiHiveManager.setInputStreamProcessingLevel(InputStreamProcessingLevel.NONE);
+
         return true;
     }
 
@@ -74,6 +81,8 @@ public class QuerySelectorProcessor {
     }
 
     private String handleSelectionList(Selector selector) {
+
+        siddhiHiveManager.setSelectorProcessingLevel(SelectorProcessingLevel.SELECTOR);
 
         List<OutputAttribute> selectionList = selector.getSelectionList();
 
@@ -117,6 +126,8 @@ public class QuerySelectorProcessor {
 
     private String handleGroupByList(Selector selector) {
 
+        siddhiHiveManager.setSelectorProcessingLevel(SelectorProcessingLevel.GROUPBY);
+
         String groupBy = " GROUP BY ";
 
         int groupByListSize = simpleAttributeList.size();
@@ -144,9 +155,7 @@ public class QuerySelectorProcessor {
         if (condition == null)
             return " ";
 
-        ProcessingMode oldProcessingMode = siddhiHiveManager.getProcessingMode();
-
-        siddhiHiveManager.setProcessingMode(ProcessingMode.SELECTOR_HAVING);
+        siddhiHiveManager.setSelectorProcessingLevel(SelectorProcessingLevel.HAVING);
 
         handleCondition = conditionHandler.processCondition(condition);
 
@@ -154,8 +163,6 @@ public class QuerySelectorProcessor {
             handleCondition = Constants.OPENING_BRACT + Constants.SPACE + handleCondition + Constants.SPACE + Constants.CLOSING_BRACT;
 
         handleCondition = Constants.HAVING + handleCondition;
-
-        siddhiHiveManager.setProcessingMode(oldProcessingMode);
 
         return handleCondition;
     }

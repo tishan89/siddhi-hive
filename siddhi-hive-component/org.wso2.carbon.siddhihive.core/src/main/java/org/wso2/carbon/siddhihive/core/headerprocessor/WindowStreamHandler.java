@@ -4,6 +4,7 @@ package org.wso2.carbon.siddhihive.core.headerprocessor;
 import org.wso2.carbon.siddhihive.core.configurations.StreamDefinitionExt;
 import org.wso2.carbon.siddhihive.core.internal.SiddhiHiveManager;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
+import org.wso2.carbon.siddhihive.core.utils.enums.InputStreamProcessingLevel;
 import org.wso2.siddhi.query.api.query.input.Stream;
 import org.wso2.siddhi.query.api.query.input.WindowStream;
 import java.util.Map;
@@ -15,7 +16,8 @@ public class WindowStreamHandler extends BasicStreamHandler {
 
     public WindowStreamHandler(SiddhiHiveManager siddhiHiveManagerParam) {
         super(siddhiHiveManagerParam);
-    }
+        getSiddhiHiveManager().setInputStreamProcessingLevel(InputStreamProcessingLevel.WINDOW_STREAM);
+     }
 
     @Override
     public Map<String, String> process(Stream stream, Map<String, StreamDefinitionExt> streamDefinitions) {
@@ -28,7 +30,8 @@ public class WindowStreamHandler extends BasicStreamHandler {
             LengthWindowStreamHandler lengthWindowStreamHandler = new LengthWindowStreamHandler(getSiddhiHiveManager());
             return lengthWindowStreamHandler.process(windowStream, streamDefinitions);
         }else if(type.equals(Constants.LENGTH_BATCH_WINDOW)){
-
+            LengthBatchWindowStreamHandler lengthBatchWindowStreamHandler = new LengthBatchWindowStreamHandler(getSiddhiHiveManager());
+            return lengthBatchWindowStreamHandler.process(windowStream, streamDefinitions);
         }
 
         return null;
