@@ -116,18 +116,27 @@ public class ConditionHandler {
 
         }else{
 
-            if(siddhiHiveManager.getCachedValues("STREAM_ID") != null )
-                streamID = siddhiHiveManager.getCachedValues("STREAM_ID");
+//            if(siddhiHiveManager.getCachedValues("STREAM_ID") != null )
+//                streamID = siddhiHiveManager.getCachedValues("STREAM_ID");
 
-            if(streamID.isEmpty() == false){
-                variableName = streamID + ".";
-            }else{
+//            if(siddhiHiveManager.getReferenceIDAlias("STREAM_ID") != null )
+//                streamID = siddhiHiveManager.getReferenceIDAlias("STREAM_ID");
+//
+//            if(streamID.isEmpty() == false){
+//                variableName = streamID + ".";
+//            }else{
+//
+//                if(variable.getStreamId() != null){
+//                    variableName = variable.getStreamId();
+//                    variableName +=".";
+//                }
+//            }
 
-                if(variable.getStreamId() != null){
-                    variableName = variable.getStreamId();
-                    variableName +=".";
-                }
+            if(variable.getStreamId() != null){
+                variableName = siddhiHiveManager.getReferenceIDAlias(variable.getStreamId()) + ".";
             }
+
+
 
             variableName += variable.getAttributeName();
         }

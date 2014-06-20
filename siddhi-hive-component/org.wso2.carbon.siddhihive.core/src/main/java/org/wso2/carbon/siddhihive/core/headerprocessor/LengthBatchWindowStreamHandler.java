@@ -137,6 +137,7 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
         getSiddhiHiveManager().addStreamGeneratedQueryID(streamReferenceID, wndSubQueryIdentifier);
         //getSiddhiHiveManager().addCachedValues(this.windowStream.getStreamId(), wndSubQueryIdentifier);
         getSiddhiHiveManager().addCachedValues("STREAM_ID", wndSubQueryIdentifier);
+        getSiddhiHiveManager().setReferenceIDAlias(this.windowStream.getStreamReferenceId(),wndSubQueryIdentifier);
 
         getSiddhiHiveManager().setWindowStreamProcessingLevel(WindowStreamProcessingLevel.LENGTH_BATCH_WINDOW_PROCESSING);
 
@@ -183,8 +184,7 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
         String aliasID = getSiddhiHiveManager().generateSubQueryIdentifier();
 
         getSiddhiHiveManager().setReferenceIDAlias(this.windowStream.getStreamReferenceId(),aliasID);
-        getSiddhiHiveManager().addCachedValues("STREAM_ID", aliasID);
-
+       // getSiddhiHiveManager().addCachedValues("STREAM_ID", aliasID);
 
         return Constants.FROM + "  " + Constants.OPENING_BRACT + "   " + secondSelectClause + "\n" + whereClause + Constants.CLOSING_BRACT + aliasID ;
     }

@@ -128,6 +128,8 @@ public class QuerySelectorProcessor {
 
         siddhiHiveManager.setSelectorProcessingLevel(SelectorProcessingLevel.GROUPBY);
 
+        if( selector.getGroupByList().size() == 0)
+            return "";
         String groupBy = " GROUP BY ";
 
         int groupByListSize = simpleAttributeList.size();
