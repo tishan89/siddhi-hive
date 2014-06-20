@@ -1,7 +1,9 @@
 package org.wso2.carbon.siddhihive.core.headerprocessor;
 
+import org.wso2.carbon.siddhihive.core.configurations.Context;
 import org.wso2.carbon.siddhihive.core.configurations.StreamDefinitionExt;
 import org.wso2.carbon.siddhihive.core.internal.SiddhiHiveManager;
+import org.wso2.carbon.siddhihive.core.internal.StateManager;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
 import org.wso2.carbon.siddhihive.core.utils.enums.ProcessingLevel;
 import org.wso2.carbon.siddhihive.core.utils.enums.WindowProcessingLevel;
@@ -39,8 +41,7 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
     private String wndSubQueryIdentifier = null;
 
 
-    public LengthBatchWindowStreamHandler(SiddhiHiveManager siddhiHiveManagerParam) {
-        super(siddhiHiveManagerParam);
+    public LengthBatchWindowStreamHandler() {
     }
 
     public Map<String, String> process(Stream stream, Map<String, StreamDefinitionExt> streamDefinitions){
@@ -125,21 +126,23 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
 
     private void initializeWndVariables(){
 
+        Context context = StateManager.getContext();
 
         String streamReferenceID = this.windowStream.getStreamReferenceId();
         String streamID =  this.windowStream.getStreamId();
 
         if( streamID.equalsIgnoreCase(streamReferenceID))
-            wndSubQueryIdentifier =  getSiddhiHiveManager().generateSubQueryIdentifier();
+            wndSubQueryIdentifier =  context.generateSubQueryIdentifier();
         else
             wndSubQueryIdentifier = streamReferenceID;
 
-        getSiddhiHiveManager().addStreamGeneratedQueryID(streamReferenceID, wndSubQueryIdentifier);
+        //getSiddhiHiveManager().addStreamGeneratedQueryID(streamReferenceID, wndSubQueryIdentifier);
         //getSiddhiHiveManager().addCachedValues(this.windowStream.getStreamId(), wndSubQueryIdentifier);
-        getSiddhiHiveManager().addCachedValues("STREAM_ID", wndSubQueryIdentifier);
-        getSiddhiHiveManager().setReferenceIDAlias(this.windowStream.getStreamReferenceId(),wndSubQueryIdentifier);
+        //getSiddhiHiveManager().addCachedValues("STREAM_ID", wndSubQueryIdentifier);
+        context.setReferenceIDAlias(streamReferenceID, wndSubQueryIdentifier);
+        context.setWindowStreamProcessingLevel(WindowStreamProcessingLevel.LENGTH_BATCH_WINDOW_PROCESSING);
 
-        getSiddhiHiveManager().setWindowStreamProcessingLevel(WindowStreamProcessingLevel.LENGTH_BATCH_WINDOW_PROCESSING);
+        StateManager.setContext(context);
 
     }
 
@@ -155,25 +158,36 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
 
         String fSelectClause = "SELECT * FROM ("
                                     +selectParamsClause + "       " + Constants.FROM + "  " + this.windowStream.getStreamId() + "  " + " WHERE " + Constants.TIMESTAMPS_COLUMN + " > " +
-                                   "${hiveconf:TIME_STAMP}" + "\n" + limitClause + ")" + clauseIdentifier;
+                                     "${hiveconf:TIME_STAMP}" + "\n" + limitClause + ")" + clauseIdentifier;
 
         return fSelectClause;
     }
 
     private String generateSecondSelectClause(){
 
-        String aliasID = getSiddhiHiveManager().generateSubQueryIdentifier();
+        Context context = StateManager.getContext();
 
-        getSiddhiHiveManager().setReferenceIDAlias(this.windowStream.getStreamReferenceId(),aliasID);
-        getSiddhiHiveManager().addCachedValues("STREAM_ID", aliasID);
+        String aliasID = context.generateSubQueryIdentifier();
+
+        context.setReferenceIDAlias(this.windowStream.getStreamReferenceId(), aliasID);
+        //context.addCachedValues("STREAM_ID", aliasID);
+
+        StateManager.setContext(context);
+
 
         return "SELECT * FROM ( \n" + this.firstSelectClause  + "\n ) " + aliasID + "\n";
     }
 
     public void invokeGenerateWhereClause(Filter filter) {
-        getSiddhiHiveManager().setWindowProcessingLevel(WindowProcessingLevel.WND_WHERE_PROCESSING);
+
+        Context context = null; 
+        context = StateManager.getContext();
+        context.setWindowProcessingLevel(WindowProcessingLevel.WND_WHERE_PROCESSING);
+        StateManager.setContext(context);
         whereClause = generateWhereClause(filter);
-        getSiddhiHiveManager().setWindowProcessingLevel(WindowProcessingLevel.NONE);
+        context = StateManager.getContext();
+        context.setWindowProcessingLevel(WindowProcessingLevel.NONE);
+        StateManager.setContext(context);
     }
 
     private String assembleWindowFromClause(){
@@ -181,10 +195,12 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
         if(whereClause.isEmpty())
             whereClause = " ";
 
-        String aliasID = getSiddhiHiveManager().generateSubQueryIdentifier();
+        Context context = StateManager.getContext();
 
-        getSiddhiHiveManager().setReferenceIDAlias(this.windowStream.getStreamReferenceId(),aliasID);
-       // getSiddhiHiveManager().addCachedValues("STREAM_ID", aliasID);
+        String aliasID = context.generateSubQueryIdentifier();
+        context.setReferenceIDAlias(this.windowStream.getStreamReferenceId(), aliasID);
+       // getSiddhiHiveManager().addCachedValues("STREAM_ID", aliasID); 
+        StateManager.setContext(context);
 
         return Constants.FROM + "  " + Constants.OPENING_BRACT + "   " + secondSelectClause + "\n" + whereClause + Constants.CLOSING_BRACT + aliasID ;
     }

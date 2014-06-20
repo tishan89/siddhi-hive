@@ -2,6 +2,7 @@ package org.wso2.carbon.siddhihive.core.internal;
 
 
 import org.apache.log4j.Logger;
+import org.wso2.carbon.siddhihive.core.configurations.Context;
 import org.wso2.carbon.siddhihive.core.configurations.StreamDefinitionExt;
 import org.wso2.carbon.siddhihive.core.headerprocessor.HeaderHandler;
 import org.wso2.carbon.siddhihive.core.tablecreation.CSVTableCreator;
@@ -36,7 +37,7 @@ public class SiddhiHiveManager {
     //private Map<String, String> inputStreamReferenceIDMap= null;// map to maintain both the stream ID and stream reference ID
 
     private Map<String, String> cachedValuesMap= null; //parent refernce
-    private Map<String, String> inputStreamGeneratedQueryMap= null; // reference ID <-----> Replacement generatedQueryID
+   // private Map<String, String> inputStreamGeneratedQueryMap= null; // reference ID <-----> Replacement generatedQueryID
 
     private ProcessingLevel processingLevel;
     private InputStreamProcessingLevel inputStreamProcessingLevel ;
@@ -44,7 +45,7 @@ public class SiddhiHiveManager {
     private WindowStreamProcessingLevel windowStreamProcessingLevel;
     private WindowProcessingLevel windowProcessingLevel;
 
-    private int subqueryCounter = 0;
+    private int subQueryCounter = 0;
 
     private Map<String, String> selectionAttributeRenameMap = null;
 
@@ -56,19 +57,9 @@ public class SiddhiHiveManager {
 
     public SiddhiHiveManager() {
         streamDefinitionMap = new ConcurrentHashMap<String, StreamDefinitionExt>();
-        //New Query Map
-       // queryMap = new ConcurrentHashMap<String, String>();
-        //inputStreamReferenceIDMap = new ConcurrentHashMap<String, String>();
-        cachedValuesMap = new ConcurrentHashMap<String, String>();
-        inputStreamGeneratedQueryMap =  new ConcurrentHashMap<String, String>();
-        selectionAttributeRenameMap = new ConcurrentHashMap<String, String>();
-        referenceIDAliasMap = new ConcurrentHashMap<String, String>();
 
-        processingLevel = ProcessingLevel.NONE;
-        inputStreamProcessingLevel = InputStreamProcessingLevel.NONE;
-        selectorProcessingLevel = SelectorProcessingLevel.NONE;
-        windowStreamProcessingLevel = WindowStreamProcessingLevel.NONE;
-        windowProcessingLevel = WindowProcessingLevel.NONE;
+        Context context = new Context();
+        StateManager.setContext(context);
 
     }
 
@@ -100,110 +91,19 @@ public class SiddhiHiveManager {
 //        return null;
 //    }
 
-    public String getStreamGeneratedQueryID(String referenceID){
-        return inputStreamGeneratedQueryMap.get(referenceID);
-    }
-
-    public void addStreamGeneratedQueryID(String referenceID, String streamGeneratedQueryID){
-         inputStreamGeneratedQueryMap.put(referenceID, streamGeneratedQueryID);
-    }
+//    public String getStreamGeneratedQueryID(String referenceID){
+//        return inputStreamGeneratedQueryMap.get(referenceID);
+//    }
+//
+//    public void addStreamGeneratedQueryID(String referenceID, String streamGeneratedQueryID){
+//         inputStreamGeneratedQueryMap.put(referenceID, streamGeneratedQueryID);
+//    }
 
 //    public void setInputStreamReferenceID(String referenceID, String streamID) {
 //        this.inputStreamReferenceIDMap.put(referenceID, streamID);
 //    }
 
-    public void addCachedValues(String cachedID, String cachedValue) {
-        this.cachedValuesMap.put(cachedID,cachedValue);
-    }
 
-    public String getCachedValues(String cachedID ) {
-
-        String cachedValue = cachedValuesMap.get(cachedID);
-
-        if(  cachedValue != null){
-            return cachedValue;
-        }else{
-
-            if( cachedValuesMap.containsValue(cachedID) )
-                return cachedID;
-        }
-        return null;
-    }
-
-    public String generateSubQueryIdentifier(){
-
-        String subQueryIdentifier = "subq" + String.valueOf(++subqueryCounter);
-
-        return subQueryIdentifier;
-    }
-
-    public String getSelectionAttributeRenameMap(String rename) {
-        return this.selectionAttributeRenameMap.get(rename);
-    }
-
-    public void addSelectionStringMap(String rename, String selectionString) {
-        this.selectionAttributeRenameMap.put(rename, selectionString);
-    }
-
-    public ProcessingLevel getProcessingLevel() {
-        return processingLevel;
-    }
-
-    public void setProcessingLevel(ProcessingLevel processingLevel) {
-
-
-
-        this.processingLevel = processingLevel;
-    }
-
-
-    public SelectorProcessingLevel getSelectorProcessingLevel() {
-        return selectorProcessingLevel;
-    }
-
-    public void setSelectorProcessingLevel(SelectorProcessingLevel selectorProcessingLevel) {
-        this.selectorProcessingLevel = selectorProcessingLevel;
-    }
-
-    public InputStreamProcessingLevel getInputStreamProcessingLevel() {
-        return inputStreamProcessingLevel;
-    }
-
-    public void setInputStreamProcessingLevel(InputStreamProcessingLevel inputStreamProcessingLevel) {
-        this.inputStreamProcessingLevel = inputStreamProcessingLevel;
-    }
-
-    public WindowStreamProcessingLevel getWindowStreamProcessingLevel() {
-        return windowStreamProcessingLevel;
-    }
-
-    public void setWindowStreamProcessingLevel(WindowStreamProcessingLevel windowStreamProcessingLevel) {
-        this.windowStreamProcessingLevel = windowStreamProcessingLevel;
-    }
-
-    public WindowProcessingLevel getWindowProcessingLevel() {
-        return windowProcessingLevel;
-    }
-
-    public void setWindowProcessingLevel(WindowProcessingLevel windowProcessingLevel) {
-        this.windowProcessingLevel = windowProcessingLevel;
-    }
-
-    public void removedCachedValues(String cachedID) {
-
-        this.cachedValuesMap.remove(cachedID);
-    }
-
-    public String getReferenceIDAlias(String referenceID) {
-
-        String alias = referenceIDAliasMap.get(referenceID);
-
-        return alias;
-    }
-
-    public void setReferenceIDAlias(String referenceID, String alias) {
-        this.referenceIDAliasMap.put(referenceID, alias);
-    }
 
     public void setSiddhiStreamDefinition(List<StreamDefinition> streamDefinitionList) {
         for (StreamDefinition definition : streamDefinitionList) {
@@ -222,21 +122,27 @@ public class SiddhiHiveManager {
 
     public String getQuery(Query query) {
 
+
         this.query = query;
 
         String hiveQuery = "";
 
-        setProcessingLevel(org.wso2.carbon.siddhihive.core.utils.enums.ProcessingLevel.INPUT_STREAM);
+        Context context = StateManager.getContext();
+
+        context.setProcessingLevel(org.wso2.carbon.siddhihive.core.utils.enums.ProcessingLevel.INPUT_STREAM);
+        StateManager.setContext(context);
         HeaderHandler headerHandler = new HeaderHandler(this);
         Map<String, String> headerMap = headerHandler.process(query.getInputStream(), this.getStreamDefinitionMap());
 
 
-        setProcessingLevel(org.wso2.carbon.siddhihive.core.utils.enums.ProcessingLevel.INPUT_STREAM.SELECTOR);
-        QuerySelectorProcessor querySelectorProcessor = new QuerySelectorProcessor(this);
+        context.setProcessingLevel(org.wso2.carbon.siddhihive.core.utils.enums.ProcessingLevel.INPUT_STREAM.SELECTOR);
+        StateManager.setContext(context);
+        QuerySelectorProcessor querySelectorProcessor = new QuerySelectorProcessor();
         querySelectorProcessor.handleSelector(query.getSelector());
         ConcurrentMap<String, String> concurrentSelectorMap = querySelectorProcessor.getSelectorQueryMap();
 
-        setProcessingLevel(org.wso2.carbon.siddhihive.core.utils.enums.ProcessingLevel.OUTPUT_STREAM);
+        context.setProcessingLevel(org.wso2.carbon.siddhihive.core.utils.enums.ProcessingLevel.OUTPUT_STREAM);
+        StateManager.setContext(context);
         OutStream outStream = query.getOutputStream();
         StreamDefinitionExt outStreamDefinition = getStreamDefinition(outStream.getStreamId());
         TableCreatorBase tableCreator = new CSVTableCreator();

@@ -31,7 +31,7 @@ public class SelectorProcessorSample {
 //        Query query = siddhiManager.getQuery(queryID);
 //
         SiddhiHiveManager siddhiHiveManager = new SiddhiHiveManager();
-        QuerySelectorProcessor selectorProcessor = new QuerySelectorProcessor(siddhiHiveManager);
+        QuerySelectorProcessor selectorProcessor = new QuerySelectorProcessor();
 //        HashMap<String, String> map = (HashMap<String, String>)selectorProcessor.handleSelector(query);
 //
 //        for (Object value : map.values()) {
