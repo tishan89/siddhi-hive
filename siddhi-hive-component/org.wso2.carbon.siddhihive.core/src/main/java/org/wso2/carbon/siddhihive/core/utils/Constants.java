@@ -64,4 +64,25 @@ public final class Constants {
     public static final String TIMESTAMPS_COLUMN = "timestamps";
 
     public static final String LENGTH_WINDOW_FREQUENCY = "timeWindowFrequency";
+    public static final String TOOL_BOX_DIRECTORY = "siddhi_hive";
+    public static final String STREAM_DEF_DIRECTORY = "streamDefn";
+    public static final String ANALYTICS_DIRECTORY = "analytics";
+
+    public static final String STREAM_DEF_FILE = "stream_definition";
+    public static final String DEFN = "defn";
+    public static final String STREAM_DEFINITIONS = "streams.definitions";
+    public static final String FILE_NAME = "filename";
+    public static final String DEFAULT_USER_NAME = "admin";
+    public static final String USER_NAME = "username";
+    public static final String DEFAULT_PASSWORD = "admin";
+    public static final String PASSWORD = "password";
+    public static final String DEFAULT_DESCRIPTION = "This is a sample event stream";
+    public static final String DESCRIPTION = "description";
+    public static final String ENABLE_INCREMENTAL = "enableIncrementalIndex";
+    public static final String PROPERTY_FILE = "streams.properties";
+    public static final String ANALYZER_SCRIPTS = "analyzers.scripts";
+    public static final String DEFAULT_ANALYZER_DESCRIPTION = "Equivalent hive query for the Siddhi query";
+    public static final String SCRIPT_FILE = "converted_hive_script";
+    public static final String SCRIPT_NAME = "script";
+    public static final String ANALYZER_PROPERTY_FILE = "analyzers.properties";
 }
