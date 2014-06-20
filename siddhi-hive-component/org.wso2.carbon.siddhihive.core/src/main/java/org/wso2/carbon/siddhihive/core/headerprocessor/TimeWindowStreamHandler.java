@@ -4,9 +4,9 @@ package org.wso2.carbon.siddhihive.core.headerprocessor;
 import org.wso2.carbon.siddhihive.core.configurations.StreamDefinitionExt;
 import org.wso2.carbon.siddhihive.core.internal.SiddhiHiveManager;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
-import org.wso2.carbon.siddhihive.core.utils.ProcessingMode;
 import org.wso2.carbon.siddhihive.core.utils.WindowProcessingState;
 import org.wso2.siddhi.query.api.expression.constant.IntConstant;
+import org.wso2.siddhi.query.api.expression.constant.LongConstant;
 import org.wso2.siddhi.query.api.query.input.Stream;
 import org.wso2.siddhi.query.api.query.input.WindowStream;
 import org.wso2.siddhi.query.api.query.input.handler.Window;
@@ -51,7 +51,11 @@ public class TimeWindowStreamHandler extends WindowStreamHandler {
         if (window.getName().equals(Constants.TIME_WINDOW)) {
             return Constants.DEFAULT_SLIDING_FREQUENCY;
         } else if (window.getName().equals(Constants.TIME_BATCH_WINDOW)) {
-            return String.valueOf(((IntConstant) window.getParameters()[0]).getValue());
+            if (window.getParameters()[0] instanceof LongConstant) {
+                return String.valueOf(((LongConstant) window.getParameters()[0]).getValue());
+            } else if (window.getParameters()[0] instanceof IntConstant) {
+                return String.valueOf(((IntConstant) window.getParameters()[0]).getValue());
+            }
         }
         return null;
     }
