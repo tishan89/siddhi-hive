@@ -63,4 +63,5 @@ public final class Constants {
     public static final String SELECT = " SELECT ";
     public static final String TIMESTAMPS_COLUMN = "timestamps";
 
+    public static final String LENGTH_WINDOW_FREQUENCY = "timeWindowFrequency";
 }
