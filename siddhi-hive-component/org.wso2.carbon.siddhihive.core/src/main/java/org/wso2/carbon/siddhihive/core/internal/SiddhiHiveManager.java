@@ -17,6 +17,8 @@ import org.wso2.siddhi.query.api.query.output.stream.OutStream;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -47,6 +49,8 @@ public class SiddhiHiveManager {
     private Map<String, String> selectionAttributeRenameMap = null;
 
     private Map<String, String> referenceIDAliasMap = null;
+    private Boolean isScheduled = false;
+    private Query query;
 
 
 
@@ -218,6 +222,7 @@ public class SiddhiHiveManager {
 
     public String getQuery(Query query) {
 
+        this.query = query;
 
         String hiveQuery = "";
 
@@ -256,6 +261,13 @@ public class SiddhiHiveManager {
         for (int j=0; j<arrCreate.length; j++) {
             inputCreate += arrCreate[j];
             inputCreate += "\n";
+        }
+        if (headerMap.get(Constants.TIME_WINDOW_FREQUENCY) != null && !isScheduled) {
+            isScheduled = true;
+            schedule(Long.valueOf(headerMap.get(Constants.TIME_WINDOW_FREQUENCY)).longValue());
+        } else if (concurrentSelectorMap.get(Constants.LENGTH_WINDOW_FREQUENCY) != null && !isScheduled) {
+            isScheduled = true;
+            schedule(Long.valueOf(headerMap.get(Constants.LENGTH_WINDOW_FREQUENCY)).longValue());
         }
 
 
@@ -297,4 +309,20 @@ public class SiddhiHiveManager {
         return hiveQuery;
 
     }
+
+    public void schedule(long timeInMillis) {
+        class ScriptTimerTask extends TimerTask {
+
+            @Override
+            public void run() {
+                SiddhiHiveManager.this.getQuery(query);
+            }
+        }
+
+        TimerTask timerTask = new ScriptTimerTask();
+        Timer timer = new Timer(true);
+        timer.scheduleAtFixedRate(timerTask, timeInMillis, timeInMillis);
+    }
+
+
 }
