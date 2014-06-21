@@ -14,15 +14,16 @@ public class ZipppingUtil {
 
     List<String> fileList;
     private String outputZipFile;
-    private String sourceFolder;
+    private File sourceFolder;
 
     public ZipppingUtil() {
         fileList = new ArrayList<String>();
     }
 
-    public void zip(String zipFile, String sourceFile) {
+    public void zip(String zipFile, File sourceFile) {
         sourceFolder = sourceFile;
         outputZipFile = zipFile;
+        generateFileList(sourceFile);
         byte[] buffer = new byte[1024];
 
         try {
@@ -44,13 +45,10 @@ public class ZipppingUtil {
                 while ((len = in.read(buffer)) > 0) {
                     zos.write(buffer, 0, len);
                 }
-
                 in.close();
             }
-
             zos.closeEntry();
             zos.close();
-
             System.out.println("Done");
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -62,7 +60,6 @@ public class ZipppingUtil {
         if (node.isFile()) {
             fileList.add(generateZipEntry(node.getAbsoluteFile().toString()));
         }
-
         if (node.isDirectory()) {
             String[] subNote = node.list();
             for (String filename : subNote) {
@@ -73,7 +70,7 @@ public class ZipppingUtil {
     }
 
     private String generateZipEntry(String file) {
-        return file.substring(sourceFolder.length() + 1, file.length());
+        return file.substring(sourceFolder.getAbsolutePath().length() + 1, file.length());
     }
 
 }

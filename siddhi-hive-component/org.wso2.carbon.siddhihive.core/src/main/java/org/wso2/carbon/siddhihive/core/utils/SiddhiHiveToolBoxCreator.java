@@ -48,11 +48,7 @@ public class SiddhiHiveToolBoxCreator {
         writeToFile(analyticDir, Constants.ANALYZER_PROPERTY_FILE, analyzerProp);
 
         ZipppingUtil zipppingUtil = new ZipppingUtil();
-        zipppingUtil.generateFileList(parentDir);
-        zipppingUtil.zip(Constants.TOOL_BOX_DIRECTORY + ".tbox", Constants.TOOL_BOX_DIRECTORY);
-
-        /*File file = new File(dir,"filename.txt");
-        File file1 = new File(dir2,"filename2.txt");*/
+        zipppingUtil.zip(Constants.TOOL_BOX_DIRECTORY + ".tbox", parentDir);
     }
 
     public String getStreamProperties(List<String> stremDefs, List<String> fileNames, Boolean incrementalProcessingEnabled) {
