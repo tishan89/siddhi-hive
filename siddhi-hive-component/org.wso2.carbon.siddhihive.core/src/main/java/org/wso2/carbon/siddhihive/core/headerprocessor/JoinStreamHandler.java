@@ -21,11 +21,9 @@ public class JoinStreamHandler implements StreamHandler {
     //**********************************************************************************************
     private Map<String, String> result;
     private JoinStream joinStream;
-    private SiddhiHiveManager siddhiHiveManager = null;
 
     //**********************************************************************************************
-    public JoinStreamHandler(SiddhiHiveManager siddhiHiveManager) {
-        this.siddhiHiveManager = siddhiHiveManager;
+    public JoinStreamHandler() {
     }
 
     //**********************************************************************************************
@@ -35,7 +33,7 @@ public class JoinStreamHandler implements StreamHandler {
         Map<String, String> mapLeftStream = processSubStream(joinStream.getLeftStream(), streamDefinitions);
         Map<String, String> mapRightStream = processSubStream(joinStream.getRightStream(), streamDefinitions);
 
-        ConditionHandler conditionHandler = new ConditionHandler(this.siddhiHiveManager);
+        ConditionHandler conditionHandler = new ConditionHandler();
         String sCondition = conditionHandler.processCondition(joinStream.getOnCompare());
 
         String sJoin = Conversions.siddhiToHiveJoin(joinStream.getType());
@@ -61,10 +59,10 @@ public class JoinStreamHandler implements StreamHandler {
     private Map<String, String> processSubStream(Stream stream, Map<String, StreamDefinitionExt> streamDefinitions) {
         Map<String, String> result;
         if (stream instanceof BasicStream) {
-            BasicStreamHandler basicStreamHandler = new BasicStreamHandler(this.siddhiHiveManager);
+            BasicStreamHandler basicStreamHandler = new BasicStreamHandler();
             result = basicStreamHandler.process(stream, streamDefinitions);
         } else if (stream instanceof WindowStream) {
-            WindowStreamHandler windowStreamHandler = new WindowStreamHandler(this.siddhiHiveManager);
+            WindowStreamHandler windowStreamHandler = new WindowStreamHandler();
             result = windowStreamHandler.process(stream, streamDefinitions);
         } else {
             result = null;

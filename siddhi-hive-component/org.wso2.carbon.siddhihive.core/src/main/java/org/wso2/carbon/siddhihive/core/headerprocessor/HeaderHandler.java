@@ -22,13 +22,13 @@ public class HeaderHandler implements StreamHandler {
     public Map<String, String> process(Stream stream, Map<String, StreamDefinitionExt> streamDefinitions) {
         Map<String, String> result;
         if (stream instanceof BasicStream) {
-            BasicStreamHandler basicStreamHandler = new BasicStreamHandler(this.siddhiHiveManager);
+            BasicStreamHandler basicStreamHandler = new BasicStreamHandler();
             result = basicStreamHandler.process(stream, streamDefinitions);
         } else if (stream instanceof WindowStream) {
-            WindowStreamHandler windowStreamHandler = new WindowStreamHandler(this.siddhiHiveManager);
+            WindowStreamHandler windowStreamHandler = new WindowStreamHandler();
             result = windowStreamHandler.process(stream, streamDefinitions);
         } else if (stream instanceof JoinStream) {
-            JoinStreamHandler joinStreamHandler = new JoinStreamHandler(this.siddhiHiveManager);
+            JoinStreamHandler joinStreamHandler = new JoinStreamHandler();
             result = joinStreamHandler.process(stream, streamDefinitions);
         } else {
             result = null;

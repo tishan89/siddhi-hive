@@ -12,11 +12,9 @@ import org.wso2.siddhi.query.api.query.selection.attribute.SimpleAttribute;
 public class AttributeHandler {
 
     private ConditionHandler conditionHandler = null;
-    private SiddhiHiveManager siddhiHiveManager = null;
-    public AttributeHandler(SiddhiHiveManager siddhiHiveManager) {
-        this.siddhiHiveManager = siddhiHiveManager;
 
-        conditionHandler = new ConditionHandler(this.siddhiHiveManager);
+    public AttributeHandler() {
+        conditionHandler = new ConditionHandler();
     }
 
     public String handleSimpleAttribute(SimpleAttribute simpleAttribute) {

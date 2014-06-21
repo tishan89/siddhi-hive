@@ -1,8 +1,10 @@
 package org.wso2.carbon.siddhihive.core.headerprocessor;
 
 
+import org.wso2.carbon.siddhihive.core.configurations.Context;
 import org.wso2.carbon.siddhihive.core.configurations.StreamDefinitionExt;
 import org.wso2.carbon.siddhihive.core.internal.SiddhiHiveManager;
+import org.wso2.carbon.siddhihive.core.internal.StateManager;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
 import org.wso2.carbon.siddhihive.core.utils.enums.WindowStreamProcessingLevel;
 import org.wso2.siddhi.query.api.expression.constant.IntConstant;
@@ -23,8 +25,7 @@ public class TimeWindowStreamHandler extends WindowStreamHandler {
     private WindowIsolator windowIsolator;
     private Map<String, String> result;
 
-    public TimeWindowStreamHandler(SiddhiHiveManager siddhiHiveManagerParam) {
-        super(siddhiHiveManagerParam);
+    public TimeWindowStreamHandler() {
         this.windowIsolator = new WindowIsolator();
     }
 
@@ -43,7 +44,11 @@ public class TimeWindowStreamHandler extends WindowStreamHandler {
         result.put(Constants.WHERE_CLAUSE, whereClause);
         result.put(Constants.INCREMENTAL_CLAUSE, windowIsolatorClause);
         result.put(Constants.TIME_WINDOW_FREQUENCY, schedulingFreq);
-        getSiddhiHiveManager().setWindowStreamProcessingLevel(WindowStreamProcessingLevel.TIME_WINDOW_PROCESSING);
+
+        Context context = StateManager.getContext();
+        context.setWindowStreamProcessingLevel(WindowStreamProcessingLevel.TIME_WINDOW_PROCESSING);
+        StateManager.setContext(context);
+
         return result;
     }
 

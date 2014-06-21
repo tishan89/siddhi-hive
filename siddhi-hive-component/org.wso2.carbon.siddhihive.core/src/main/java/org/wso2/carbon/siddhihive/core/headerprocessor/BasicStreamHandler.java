@@ -18,14 +18,8 @@ public class BasicStreamHandler implements StreamHandler {
     private String whereClause;
     private BasicStream basicStream;
     private Map<String, String> result;
-    private SiddhiHiveManager siddhiHiveManager;
 
-
-
-    public BasicStreamHandler(SiddhiHiveManager siddhiHiveManagerParam){
-
-        this.siddhiHiveManager = siddhiHiveManagerParam;
-        //this.siddhiHiveManager.setWindowProcessingState(WindowProcessingState.WINDOW_PROCESSING);
+    public BasicStreamHandler(){
     }
 
     @Override
@@ -46,7 +40,7 @@ public class BasicStreamHandler implements StreamHandler {
 
 public String generateWhereClause(Filter filter) {
         if (filter != null) {
-            ConditionHandler conditionHandler = new ConditionHandler(this.siddhiHiveManager);
+            ConditionHandler conditionHandler = new ConditionHandler();
             String filterStr = conditionHandler.processCondition(filter.getFilterCondition());
             return Constants.WHERE + " " + filterStr;
         } else {
@@ -55,11 +49,7 @@ public String generateWhereClause(Filter filter) {
 
     }
 
-    public SiddhiHiveManager getSiddhiHiveManager(){
-        return siddhiHiveManager;
-    }
-
-//    public void addStreamReference(String referenceID, String streamID){
+  //    public void addStreamReference(String referenceID, String streamID){
 //        getSiddhiHiveManager().setInputStreamReferenceID(referenceID, streamID);
 //    }
 }

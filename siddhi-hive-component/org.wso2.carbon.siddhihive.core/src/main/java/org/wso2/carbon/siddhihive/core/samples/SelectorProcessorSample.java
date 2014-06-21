@@ -31,7 +31,7 @@ public class SelectorProcessorSample {
 //        Query query = siddhiManager.getQuery(queryID);
 //
         SiddhiHiveManager siddhiHiveManager = new SiddhiHiveManager();
-        QuerySelectorProcessor selectorProcessor = new QuerySelectorProcessor(siddhiHiveManager);
+        QuerySelectorProcessor selectorProcessor = new QuerySelectorProcessor();
 //        HashMap<String, String> map = (HashMap<String, String>)selectorProcessor.handleSelector(query);
 //
 //        for (Object value : map.values()) {
@@ -51,18 +51,18 @@ public class SelectorProcessorSample {
 //                "insert into FastMovingStockQuotes");
 
         System.out.println("+++++++++++++++++++++++++++");
-        String queryID = siddhiManager.addQuery(" from StockExchangeStream[symbol == \"IBM\"]#window.lengthBatch(1)\n" +
-                "select symbol,price, avg(price) as averagePrice \n" +
-                "group by symbol\n" +
-                "having ((price > averagePrice*1.02) and ( (averagePrice*0.98 > price) or (averagePrice*0.98 < price) ))\n" +
-                "insert into FastMovingStockQuotes;");
+//        String queryID = siddhiManager.addQuery(" from StockExchangeStream[symbol == \"IBM\"]#window.lengthBatch(1)\n" +
+//                "select symbol,price, avg(price) as averagePrice \n" +
+//                "group by symbol\n" +
+//                "having ((price > averagePrice*1.02) and ( (averagePrice*0.98 > price) or (averagePrice*0.98 < price) ))\n" +
+//                "insert into FastMovingStockQuotes;");
 
 
 
-//           String queryID = siddhiManager.addQuery(" from StockExchangeStream[symbol == \"IBM\"]#window.length(6000) \n" +
-//                "join StockQuote#window.length(500)  \n" +
-//                " on StockExchangeStream.symbol == StockQuote.symbol  select *\n" +
-//                "insert into JoinStream;");
+           String queryID = siddhiManager.addQuery(" from StockExchangeStream[symbol == \"IBM\"]#window.lengthBatch(6000) \n" +
+                "join StockQuote#window.lengthBatch(500)  \n" +
+                " on StockExchangeStream.symbol == StockQuote.symbol  select *\n" +
+                "insert into JoinStream;");
 
 
         Query query = siddhiManager.getQuery(queryID);
