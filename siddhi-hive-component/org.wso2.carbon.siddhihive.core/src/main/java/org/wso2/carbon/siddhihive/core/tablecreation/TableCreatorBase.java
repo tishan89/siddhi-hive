@@ -62,7 +62,8 @@ public abstract class TableCreatorBase {
 
     //**********************************************************************************************
     protected void fillHiveFieldString() {
-        sHiveColumns = listColumns.get(0).getFieldName() + " " + listColumns.get(0).getDataType();
+        sHiveColumns = "primeKey STRING ,  \t";
+        sHiveColumns += listColumns.get(0).getFieldName() + " " + listColumns.get(0).getDataType();
         for (int i = 1; i < listColumns.size(); i++) {
             sHiveColumns += (", " + listColumns.get(i).getFieldName() + " " + listColumns.get(i).getDataType());
         }

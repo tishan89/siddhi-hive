@@ -35,6 +35,7 @@ public class LengthWindowStreamHandler extends WindowStreamHandler {
     private String whereClause;
     private String selectParamsClause;
     private String limitClause;
+    private String  schedulingFreq;
 
     private String wndSubQueryIdentifier = null;
 
@@ -51,6 +52,8 @@ public class LengthWindowStreamHandler extends WindowStreamHandler {
     public Map<String, String> process(Stream stream, Map<String, StreamDefinitionExt> streamDefinitions){
 
         this.windowStream = (WindowStream) stream;
+
+        schedulingFreq = String.valueOf(Constants.LENGTH_WINDOW_FREQUENCY_TIME);
         initializeWndVariables();
         selectParamsClause = generateWindowSelectClause(); //SELECT     StockExchangeStream.symbol  , StockExchangeStream.price , StockExchangeStream.timestamps
         limitClause = generateLimitLength();
@@ -62,6 +65,7 @@ public class LengthWindowStreamHandler extends WindowStreamHandler {
         fromClause = assembleWindowFromClause(); //  from
         result = new HashMap<String, String>();
         result.put(Constants.LENGTH_WIND_FROM_QUERY, fromClause);
+        result.put(Constants.LENGTH_WINDOW_FREQUENCY,schedulingFreq);
 
         finalizeWndVariable();
         return result;
@@ -201,7 +205,7 @@ public class LengthWindowStreamHandler extends WindowStreamHandler {
         String aliasID = context.generateSubQueryIdentifier();
 
         context.setReferenceIDAlias(this.windowStream.getStreamReferenceId(), aliasID);
-        context.addCachedValues("STREAM_ID", aliasID);
+       // context.addCachedValues("STREAM_ID", aliasID);
 
         StateManager.setContext(context);
 

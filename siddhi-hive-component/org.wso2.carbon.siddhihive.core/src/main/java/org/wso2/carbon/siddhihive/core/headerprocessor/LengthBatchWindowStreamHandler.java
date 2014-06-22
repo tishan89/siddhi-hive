@@ -2,10 +2,8 @@ package org.wso2.carbon.siddhihive.core.headerprocessor;
 
 import org.wso2.carbon.siddhihive.core.configurations.Context;
 import org.wso2.carbon.siddhihive.core.configurations.StreamDefinitionExt;
-import org.wso2.carbon.siddhihive.core.internal.SiddhiHiveManager;
 import org.wso2.carbon.siddhihive.core.internal.StateManager;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
-import org.wso2.carbon.siddhihive.core.utils.enums.ProcessingLevel;
 import org.wso2.carbon.siddhihive.core.utils.enums.WindowProcessingLevel;
 import org.wso2.carbon.siddhihive.core.utils.enums.WindowStreamProcessingLevel;
 import org.wso2.siddhi.query.api.definition.Attribute;
@@ -35,6 +33,7 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
     private String whereClause;
     private String selectParamsClause;
     private String limitClause;
+    private String  schedulingFreq;
 
     private String firstSelectClause;
     private String secondSelectClause;
@@ -48,7 +47,7 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
 
         this.windowStream = (WindowStream) stream;
         initializeWndVariables();
-
+        schedulingFreq = String.valueOf(Constants.LENGTH_WINDOW_BATCH_FREQUENCY_TIME);
 
         initializationScript = generateInitializationScript();
         selectParamsClause = generateWindowSelectClause(); //SELECT     StockExchangeStream.symbol  , StockExchangeStream.price , StockExchangeStream.timestamps
@@ -61,6 +60,8 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
         result = new HashMap<String, String>();
         result.put(Constants.LENGTH_WIND_FROM_QUERY, fromClause);
         result.put(Constants.INITALIZATION_SCRIPT, initializationScript);
+
+        result.put(Constants.LENGTH_WINDOW_BATCH_FREQUENCY,schedulingFreq);
         //getSiddhiHiveManager().setWindowProcessingState(WindowProcessingState.WINDOW_PROCESSED);
 
         return result;
@@ -71,6 +72,8 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
         StreamDefinition streamDefinition = windowStream.getStreamDefinition();
 
         String params = "";
+
+        Context context = StateManager.getContext();
 
         if(streamDefinition != null){
 
@@ -87,7 +90,7 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
                     params += " , " + streamID + "." + attribute.getName() + " ";
             }
 
-            params += ", " + streamID + "." + Constants.TIMESTAMPS_COLUMN + "  ,  " + " setCounterAndTimestamp( " + streamID + "." + Constants.TIMESTAMPS_COLUMN + " )";
+            params += ", " + streamID + "." + Constants.TIMESTAMPS_COLUMN + "  ,  " + " setCounterAndTimestamp( TIMESTAMP_" + context.generateTimeStampCounter(false) +", "+ streamID + "." + Constants.TIMESTAMPS_COLUMN + " )";
         }
 
         if(params.isEmpty())
@@ -100,29 +103,66 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
 
     private String generateEndingPhrase(){
 
+        Context context = StateManager.getContext();
+
         String orderBY = Constants.ORDER_BY + "  " + windowStream.getStreamId() + "." + Constants.TIMESTAMPS_COLUMN + "   " + "ASC" + "\n";
-        String limit = "LIMIT ${hiveconf:LIMIT_COUNT}"+ "\n";
+        String limit = "LIMIT ${hiveconf:LIMIT_COUNT_"+context.generateLimitCounter(false)+"}"+ "\n";
         return orderBY + limit ;
     }
 
     private String generateInitializationScript(){
 
-        Expression expression = windowStream.getWindow().getParameters()[0];
-        IntConstant intConstant = (IntConstant)expression;
-        int length = intConstant.getValue();
+        Context context = StateManager.getContext();
 
-        long time = 1402315118124l;
+        context.generateTimeStampCounter(true);
+        context.generateLimitCounter(true);
 
-        String timeStamp = "set TIME_STAMP=" + String.valueOf(time) +";" + "\n";
-        String maxLimit = "set MAX_LIMIT="+length+";"+ "\n";
-        String opMode="set OP_MODE="+"\'NORML\'"+";" + "\n";
-        String analyzer=" analyzer resolvePath(path=\"file://${CARBON_HOME}/repository/components/lib/udf_SiddhiHive.jar\");" + "\n";
-        String hiveAux="set hive.aux.jars.path=${hiveconf:FILE_PATH};" + "\n";
-        String tempFunction = "create temporary function setCounterAndTimestamp as 'org.wso2.siddhihive.udfunctions.UDFIncrementalCounter';"+"\n";
-        String executionInitializerClass = "class org.wso2.siddhihive.analytics.ScriptExecutionInitializer;"+"\n";
+        if(context.getIsScheduled() == false){
+            Expression expression = windowStream.getWindow().getParameters()[0];
+            IntConstant intConstant = (IntConstant)expression;
+            int length = intConstant.getValue();
 
-        return timeStamp + maxLimit + opMode+analyzer + hiveAux + tempFunction + executionInitializerClass;
+            long time = 1402315118124l;
+
+
+            String timeStamp = "set TIME_STAMP_" + context.generateTimeStampCounter(false)+"=" + String.valueOf(time) +";" + "\n";
+            String maxLimit = "set MAX_LIMIT_" + context.generateLimitCounter(false) + "=" + length +";"+ "\n";
+            String limitCount = "set LIMIT_COUNT__" + context.generateLimitCounter(false) + "=" + length +";"+ "\n";
+
+            return timeStamp + maxLimit + limitCount;
+        }
+        StateManager.setContext(context);
+        return  " ";
     }
+
+//    private void oneTimeExecutionScriptOnSchedule(){
+//
+//        Context context = StateManager.getContext();
+//
+//        context.generateTimeStampCounter(true);
+//        context.generateLimitCounter(true);
+//
+//        if(context.getIsScheduled() == false){
+//            Expression expression = windowStream.getWindow().getParameters()[0];
+//            IntConstant intConstant = (IntConstant)expression;
+//            int length = intConstant.getValue();
+//
+//            long time = 1402315118124l;
+//
+//
+//            String timeStamp = "set TIME_STAMP_" + context.generateTimeStampCounter(false)+"=" + String.valueOf(time) +";" + "\n";
+//            String maxLimit = "set MAX_LIMIT_" + context.generateLimitCounter(false) + "=" + length +";"+ "\n";
+//            String limitCount = "set LIMIT_COUNT__" + context.generateLimitCounter(false) + "=" + length +";"+ "\n";
+//
+////            String analyzer=" analyzer resolvePath(path=\"file://${CARBON_HOME}/repository/components/lib/udf_SiddhiHive.jar\");" + "\n";
+////            String hiveAux="set hive.aux.jars.path=${hiveconf:FILE_PATH};" + "\n";
+////            String tempFunction = "create temporary function setCounterAndTimestamp as 'org.wso2.siddhihive.udfunctions.UDFIncrementalCounter';"+"\n";
+////            String executionInitializerClass = "class org.wso2.siddhihive.analytics.ScriptExecutionInitializer;"+"\n";
+//        }
+//
+//
+//        StateManager.setContext(context);
+//    }
 
     private void initializeWndVariables(){
 
@@ -148,6 +188,8 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
 
     private String generateFirstSelectClause(){
 
+        Context context = StateManager.getContext();
+
         String clauseIdentifier = wndSubQueryIdentifier;
 
         String streamReferenceID = this.windowStream.getStreamReferenceId();
@@ -158,7 +200,7 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
 
         String fSelectClause = "SELECT * FROM ("
                                     +selectParamsClause + "       " + Constants.FROM + "  " + this.windowStream.getStreamId() + "  " + " WHERE " + Constants.TIMESTAMPS_COLUMN + " > " +
-                                     "${hiveconf:TIME_STAMP}" + "\n" + limitClause + ")" + clauseIdentifier;
+                                     "${hiveconf:TIME_STAMP_"+context.generateTimeStampCounter(false) + "}" + "\n" + limitClause + ")" + clauseIdentifier;
 
         return fSelectClause;
     }

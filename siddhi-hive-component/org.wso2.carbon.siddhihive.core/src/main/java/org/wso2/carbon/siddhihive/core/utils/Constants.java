@@ -63,7 +63,6 @@ public final class Constants {
     public static final String SELECT = " SELECT ";
     public static final String TIMESTAMPS_COLUMN = "timestamps";
 
-    public static final String LENGTH_WINDOW_FREQUENCY = "timeWindowFrequency";
     public static final String TOOL_BOX_DIRECTORY = "siddhi_hive";
     public static final String STREAM_DEF_DIRECTORY = "streamDefn";
     public static final String ANALYTICS_DIRECTORY = "analytics";
@@ -85,4 +84,16 @@ public final class Constants {
     public static final String SCRIPT_FILE = "converted_hive_script";
     public static final String SCRIPT_NAME = "script";
     public static final String ANALYZER_PROPERTY_FILE = "analyzers.properties";
+
+    public static final String LENGTH_WINDOW_FREQUENCY = "lengthWndFrequency";
+    public static final String LENGTH_WINDOW_BATCH_FREQUENCY = "lengthWndBatchFrequency";
+    public static final String LENGTH_WINDOW_FREQUENCY_TIME = "600";
+    public static final String LENGTH_WINDOW_BATCH_FREQUENCY_TIME = "2000";
+
+
+    public static final String ANALYZER_STRING = "analyzer resolvePath(path=\"file://${CARBON_HOME}/repository/components/lib/udf_SiddhiHive.jar);";
+    public static final String HIVE_AUX_JAR    = "set hive.aux.jars.path=${hiveconf:FILE_PATH};";
+    public static final String TEMP_FUNCTION   = "create temporary function setCounterAndTimestamp as 'org.wso2.siddhihive.udfunctions.UDFIncrementalCounter';";
+    public static final String EXECUTION_INITIALIZER   ="class org.wso2.siddhihive.analytics.ScriptExecutionInitializer;";
+    public static final String INITIALIZATION_STATEMENT = ANALYZER_STRING + "\n" + HIVE_AUX_JAR + "\n" + TEMP_FUNCTION + "\n" + EXECUTION_INITIALIZER + "\n";
 }

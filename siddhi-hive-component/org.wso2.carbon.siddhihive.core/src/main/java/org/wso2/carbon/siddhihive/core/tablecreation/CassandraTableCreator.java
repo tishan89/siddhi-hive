@@ -26,7 +26,9 @@ public final class CassandraTableCreator extends TableCreatorBase {
         fillHiveFieldString();
         fillCassandraProperties();
 
-        sCassandraQuery = ("CREATE EXTERNAL TABLE IF NOT EXISTS " + sDBName + " (" + sHiveColumns +
+        sCassandraQuery = "DROP IF EXISTS " +  sDBName + " ;\n";
+
+        sCassandraQuery += ("CREATE EXTERNAL TABLE IF NOT EXISTS " + sDBName + " (" + sHiveColumns +
                 ") STORED BY \'org.apache.hadoop.hive.cassandra.CassandraStorageHandler\' WITH SERDEPROPERTIES " +
                 "(" + sCassandraProperties +");");
 

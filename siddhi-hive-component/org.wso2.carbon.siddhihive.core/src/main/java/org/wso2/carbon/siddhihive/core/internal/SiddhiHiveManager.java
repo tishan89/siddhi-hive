@@ -272,12 +272,18 @@ public class SiddhiHiveManager {
             inputCreate += arrCreate[j];
             inputCreate += "\n";
         }
+
         if (headerMap.get(Constants.TIME_WINDOW_FREQUENCY) != null && !isScheduled) {
             isScheduled = true;
             schedule(Long.valueOf(headerMap.get(Constants.TIME_WINDOW_FREQUENCY)).longValue());
-        } else if (concurrentSelectorMap.get(Constants.LENGTH_WINDOW_FREQUENCY) != null && !isScheduled) {
+        } else if ( ( (concurrentSelectorMap.get(Constants.LENGTH_WINDOW_FREQUENCY) != null) ||  ( (concurrentSelectorMap.get(Constants.LENGTH_WINDOW_BATCH_FREQUENCY) != null)   ) ) && !isScheduled) {
             isScheduled = true;
-            schedule(Long.valueOf(headerMap.get(Constants.LENGTH_WINDOW_FREQUENCY)).longValue());
+            long scheduleTime = getScheduleTime(concurrentSelectorMap, Constants.LENGTH_WINDOW_FREQUENCY, Constants.LENGTH_WINDOW_BATCH_FREQUENCY);
+            schedule(scheduleTime);
+        }else if ( ( (headerMap.get(Constants.LENGTH_WINDOW_FREQUENCY) != null) ||  ( (headerMap.get(Constants.LENGTH_WINDOW_BATCH_FREQUENCY) != null)   ) ) && !isScheduled) {
+            isScheduled = true;
+            long scheduleTime = getScheduleTime(headerMap, Constants.LENGTH_WINDOW_FREQUENCY, Constants.LENGTH_WINDOW_BATCH_FREQUENCY);
+            schedule(scheduleTime);
         }
 
 
@@ -314,8 +320,10 @@ public class SiddhiHiveManager {
             incrementalClause = " ";
 
        // hiveQuery = outputQuery + "\n" + incrementalClause + "\n" + fromClause + "\n " + selectQuery + "\n " + groupByQuery + "\n " + havingQuery + "\n " + whereClause + "\n ";
-        hiveQuery = inputCreate + "\n" + outputCreate +"\n" +outputInsertQuery + "\n" + incrementalClause + "\n" + initializationScript + "\n" + selectQuery + "\n " + fromClause + "\n " +whereClause + "\n " + groupByQuery + "\n " + havingQuery + "\n ";
+        hiveQuery = Constants.INITIALIZATION_STATEMENT + inputCreate + "\n" + outputCreate +"\n" +outputInsertQuery + "\n" + incrementalClause + "\n" + initializationScript + "\n" + selectQuery + "\n " + fromClause + "\n " +whereClause + "\n " + groupByQuery + "\n " + havingQuery + "\n ";
 
+        context.reset();
+        StateManager.setContext(context);
         return hiveQuery;
 
     }
@@ -332,6 +340,37 @@ public class SiddhiHiveManager {
         TimerTask timerTask = new ScriptTimerTask();
         Timer timer = new Timer(true);
         timer.scheduleAtFixedRate(timerTask, timeInMillis, timeInMillis);
+    }
+
+    private long getScheduleTime(Map<String, String> timeMap, String frequency, String batchFrequency){
+
+        String scheduleTime = null;
+        String batchScheduleTime = null;
+
+        scheduleTime = timeMap.get(frequency);
+        batchScheduleTime = timeMap.get(batchFrequency);
+
+        long scheduleValue = 0l;
+        long batchScheduleValue = 0l;
+
+        long scheduleFinalValue = 0l;
+
+        if( (scheduleTime != null) && (batchScheduleTime != null) ){
+
+            scheduleValue = Long.valueOf(scheduleTime).longValue();
+            batchScheduleValue = Long.valueOf(batchScheduleTime).longValue();
+
+            if(scheduleValue > batchScheduleValue)
+                scheduleFinalValue = batchScheduleValue;
+            else
+                scheduleFinalValue = scheduleValue;
+        }else if(scheduleTime != null){
+            scheduleFinalValue =  Long.valueOf(scheduleTime).longValue();
+        }else if(batchScheduleTime != null){
+            scheduleFinalValue =  Long.valueOf(batchScheduleTime).longValue();
+        }
+
+        return scheduleFinalValue;
     }
 
 

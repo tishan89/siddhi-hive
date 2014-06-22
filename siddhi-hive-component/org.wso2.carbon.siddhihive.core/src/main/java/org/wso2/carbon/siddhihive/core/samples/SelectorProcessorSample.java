@@ -5,6 +5,7 @@ import org.wso2.carbon.siddhihive.core.internal.SiddhiHiveManager;
 import org.wso2.carbon.siddhihive.core.selectorprocessor.QuerySelectorProcessor;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
+import org.wso2.siddhi.query.api.expression.Expression;
 import org.wso2.siddhi.query.api.query.Query;
 
 import java.util.AbstractList;
@@ -19,6 +20,8 @@ public class SelectorProcessorSample {
 
     public static void main(String[] args) {
 
+
+
         SiddhiManager siddhiManager = new SiddhiManager();
 
         siddhiManager.defineStream("define stream StockExchangeStream ( symbol string, price int )");
@@ -31,6 +34,9 @@ public class SelectorProcessorSample {
 //        Query query = siddhiManager.getQuery(queryID);
 //
         SiddhiHiveManager siddhiHiveManager = new SiddhiHiveManager();
+
+        int count = 0;
+        while(count < 2){
         QuerySelectorProcessor selectorProcessor = new QuerySelectorProcessor();
 //        HashMap<String, String> map = (HashMap<String, String>)selectorProcessor.handleSelector(query);
 //
@@ -87,6 +93,16 @@ public class SelectorProcessorSample {
 
         String hiveQuery = siddhiHiveManager.getQuery(query);
         System.out.println(hiveQuery);
+//
+//        try {
+//            Thread.sleep(1000);
+//        }catch (Exception ex){
+//
+//        }
+
+            ++count;
+       }
+
 //        ConcurrentHashMap<String, String> map = null;
 //
 //        if (selectorProcessor.handleSelector(query)) {

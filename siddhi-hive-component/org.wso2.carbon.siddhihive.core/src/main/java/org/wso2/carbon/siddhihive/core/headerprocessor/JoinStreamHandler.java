@@ -51,6 +51,29 @@ public class JoinStreamHandler implements StreamHandler {
         String sQuery = "from (select * from " + sLeftString + " "+ sJoin + " " + sRightString+ " ON " + sCondition + ")";
 
         result = new HashMap<String, String>();
+
+        String leftInitializationScript = mapLeftStream.get(Constants.INITALIZATION_SCRIPT);
+        String rightInitializationScript = mapRightStream.get(Constants.INITALIZATION_SCRIPT);
+
+        String initializationScript = "";
+
+        if(leftInitializationScript != null)
+            initializationScript = leftInitializationScript + "\n";
+
+        if(rightInitializationScript != null)
+            initializationScript += rightInitializationScript + "\n";
+
+        if(initializationScript.isEmpty() == false)
+            result.put(Constants.INITALIZATION_SCRIPT, initializationScript);
+
+
+        if(result.get(Constants.LENGTH_WINDOW_BATCH_FREQUENCY) != null)
+            result.put(Constants.LENGTH_WINDOW_BATCH_FREQUENCY, result.get(Constants.LENGTH_WINDOW_BATCH_FREQUENCY) );
+
+
+        if(result.get(Constants.LENGTH_WINDOW_FREQUENCY) != null)
+            result.put(Constants.LENGTH_WINDOW_FREQUENCY, result.get(Constants.LENGTH_WINDOW_FREQUENCY) );
+
         result.put(Constants.JOIN_CLAUSE, sQuery);
         return result;
     }

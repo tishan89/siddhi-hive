@@ -27,6 +27,11 @@ public class Context {
 
     private Boolean isScheduled = false;
 
+    private int timeStampCounter = 0;
+    private int limitCounter = 0;
+
+
+
     public Context(){
 
         cachedValuesMap = new ConcurrentHashMap<String, String>();
@@ -49,23 +54,23 @@ public class Context {
         this.isScheduled = isScheduled;
     }
 
-    public void addCachedValues(String cachedID, String cachedValue) {
-        this.cachedValuesMap.put(cachedID,cachedValue);
-    }
-
-    public String getCachedValues(String cachedID ) {
-
-        String cachedValue = cachedValuesMap.get(cachedID);
-
-        if(  cachedValue != null){
-            return cachedValue;
-        }else{
-
-            if( cachedValuesMap.containsValue(cachedID) )
-                return cachedID;
-        }
-        return null;
-    }
+//    public void addCachedValues(String cachedID, String cachedValue) {
+//        this.cachedValuesMap.put(cachedID,cachedValue);
+//    }
+//
+//    public String getCachedValues(String cachedID ) {
+//
+//        String cachedValue = cachedValuesMap.get(cachedID);
+//
+//        if(  cachedValue != null){
+//            return cachedValue;
+//        }else{
+//
+//            if( cachedValuesMap.containsValue(cachedID) )
+//                return cachedID;
+//        }
+//        return null;
+//    }
 
     public String generateSubQueryIdentifier(){
 
@@ -138,4 +143,37 @@ public class Context {
         this.referenceIDAliasMap.put(referenceID, alias);
     }
 
+    public int generateTimeStampCounter(boolean generateNew){
+
+        if(!generateNew)
+            return timeStampCounter;
+
+        return ++timeStampCounter;
+    }
+
+    public void reset(){
+        timeStampCounter = 0;
+        subQueryCounter = 0;
+        limitCounter = 0;
+
+        cachedValuesMap.clear();
+        selectionAttributeRenameMap.clear();
+        referenceIDAliasMap.clear();
+
+        processingLevel = ProcessingLevel.NONE;
+        inputStreamProcessingLevel = InputStreamProcessingLevel.NONE;
+        selectorProcessingLevel = SelectorProcessingLevel.NONE;
+        windowStreamProcessingLevel = WindowStreamProcessingLevel.NONE;
+        windowProcessingLevel = WindowProcessingLevel.NONE;
+
+    }
+
+
+    public int generateLimitCounter(boolean generateNew){
+
+        if(!generateNew)
+            return limitCounter;
+
+        return ++limitCounter;
+    }
 }
