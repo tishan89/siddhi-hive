@@ -39,11 +39,11 @@ public class SiddhiHiveDS {
         //context.getBundleContext().ungetService();
     }
 
-    protected void setEventStreamService(EventStreamService eventStreamService) {
+    protected void setEventStreamManagerService(EventStreamService eventStreamService) {
         SiddhiHiveValueHolder.getInstance().setEventStreamService(eventStreamService);
     }
 
-    protected void unsetEventStreamService(EventStreamService eventStreamService) {
+    protected void unsetEventStreamManagerService(EventStreamService eventStreamService) {
         SiddhiHiveValueHolder.getInstance().unsetEventStreamService();
     }
 }
