@@ -211,12 +211,19 @@ public class SiddhiHiveManager {
     }
 
     public void setSiddhiStreamDefinition(List<StreamDefinition> streamDefinitionList) {
+
         for (StreamDefinition definition : streamDefinitionList) {
+            int i = 0;
             for (Map.Entry<String, StreamDefinitionExt> entry : streamDefinitionMap.entrySet()) {
-                if (!(definition.getStreamId().equals(entry.getKey()))) {
-                    StreamDefinitionExt streamDefinition = new StreamDefinitionExt(definition.getStreamId(), definition);
-                    this.setStreamDefinition(streamDefinition.getFullQualifiedStreamID(), streamDefinition);
+                i++;
+                if ((!(definition.getStreamId().equals(entry.getKey()))) && (i < streamDefinitionMap.entrySet().size())) {
+                    continue;
+
+                } else if (definition.getStreamId().equals(entry.getKey())) {
+                    break;
                 }
+                StreamDefinitionExt streamDefinition = new StreamDefinitionExt(definition.getStreamId(), definition);
+                this.setStreamDefinition(streamDefinition.getFullQualifiedStreamID(), streamDefinition);
             }
         }
     }
