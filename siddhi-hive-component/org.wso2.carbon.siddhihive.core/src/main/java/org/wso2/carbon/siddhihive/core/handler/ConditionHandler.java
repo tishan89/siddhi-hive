@@ -133,7 +133,11 @@ public class ConditionHandler {
 //            }
 
             if(variable.getStreamId() != null){
-                variableName = context.getReferenceIDAlias(variable.getStreamId()) + ".";
+                if (context.getReferenceIDAlias(variable.getStreamId()) != null) {
+                    variableName = context.getReferenceIDAlias(variable.getStreamId()) + ".";
+                } else {
+                    variableName = variable.getStreamId() + ".";
+                }
             }
 
 
