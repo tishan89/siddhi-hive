@@ -60,7 +60,7 @@ public class WindowIsolator {
         }
         //long duration = (long) ((LongConstant) window.getParameters()[0]).getValue();
         long toTime = currentTime + duration;
-        propertyMap.put(Constants.FROM_TIME, String.valueOf(currentTime));
-        propertyMap.put(Constants.TO_TIME, String.valueOf(toTime));
+        propertyMap.put(Constants.FROM_TIME, "$NOW-" + duration);
+        propertyMap.put(Constants.TO_TIME, "$NOW");
     }
 }
