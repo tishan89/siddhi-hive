@@ -26,7 +26,7 @@ public final class CassandraTableCreator extends TableCreatorBase {
         fillHiveFieldString();
         fillCassandraProperties();
 
-        sCassandraQuery = "DROP IF EXISTS " +  sDBName + " ;\n";
+        sCassandraQuery = "DROP TABLE IF EXISTS " +  sDBName + " ;\n";
 
         sCassandraQuery += ("CREATE EXTERNAL TABLE IF NOT EXISTS " + sDBName + " (" + sHiveColumns +
                 ") STORED BY \'org.apache.hadoop.hive.cassandra.CassandraStorageHandler\' WITH SERDEPROPERTIES " +
@@ -51,5 +51,7 @@ public final class CassandraTableCreator extends TableCreatorBase {
         for (int i=0; i<listColumns.size(); i++) {
             sCassandraColumns += (", payload_" + listColumns.get(i).getFieldName());
         }
+
+        sCassandraColumns += (", Timestamp");
     }
 }

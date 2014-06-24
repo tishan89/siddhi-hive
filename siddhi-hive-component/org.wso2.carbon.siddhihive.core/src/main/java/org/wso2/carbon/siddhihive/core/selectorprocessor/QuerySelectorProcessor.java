@@ -115,6 +115,8 @@ public class QuerySelectorProcessor {
                 selectionString += " , ";
         }
 
+        selectionString += ", timestamps";
+
         return selectionString;
     }
 

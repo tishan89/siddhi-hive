@@ -290,6 +290,9 @@ public class SiddhiHiveManager {
         String fromClause = headerMap.get(Constants.FROM_CLAUSE);
         if (fromClause == null)
             fromClause = headerMap.get(Constants.LENGTH_WIND_FROM_QUERY);
+        else
+            fromClause = headerMap.get(Constants.LENGTH_BATCH_WIND_FROM_QUERY);
+
         if (fromClause == null)
             fromClause = headerMap.get(Constants.JOIN_CLAUSE);
 
@@ -298,7 +301,7 @@ public class SiddhiHiveManager {
         if (initializationScript == null)
             initializationScript = " ";
 
-        String selectQuery = "SELECT " + concurrentSelectorMap.get(Constants.SELECTION_QUERY);
+        String selectQuery = "SELECT \'Dummy Key\', " + concurrentSelectorMap.get(Constants.SELECTION_QUERY);
         String groupByQuery = concurrentSelectorMap.get(Constants.GROUP_BY_QUERY);
 
         if (groupByQuery == null)
@@ -320,7 +323,7 @@ public class SiddhiHiveManager {
             incrementalClause = " ";
 
        // hiveQuery = outputQuery + "\n" + incrementalClause + "\n" + fromClause + "\n " + selectQuery + "\n " + groupByQuery + "\n " + havingQuery + "\n " + whereClause + "\n ";
-        hiveQuery = Constants.INITIALIZATION_STATEMENT + inputCreate + "\n" + outputCreate +"\n" +outputInsertQuery + "\n" + incrementalClause + "\n" + initializationScript + "\n" + selectQuery + "\n " + fromClause + "\n " +whereClause + "\n " + groupByQuery + "\n " + havingQuery + "\n ";
+        hiveQuery = initializationScript  +  inputCreate + "\n" + outputCreate +"\n" + incrementalClause + "\n" + "\n" +  Constants.INITIALIZATION_STATEMENT + "\n" + outputInsertQuery + "\n" + selectQuery + "\n " + fromClause + "\n " +whereClause + "\n " + groupByQuery + "\n " + havingQuery + "\n " +";";
 
         context.reset();
         StateManager.setContext(context);

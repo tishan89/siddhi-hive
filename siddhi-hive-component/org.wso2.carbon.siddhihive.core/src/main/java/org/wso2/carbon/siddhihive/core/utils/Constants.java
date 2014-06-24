@@ -55,6 +55,7 @@ public final class Constants {
     public static final String GROUP_BY_QUERY = "groupByQuery";
     public static final String HAVING_QUERY = "havingQuery";
     public static final String LENGTH_WIND_FROM_QUERY = "lengthWndFromQuery";
+    public static final String LENGTH_BATCH_WIND_FROM_QUERY = "lengthBatchWndFromQuery";
     public static final String DEFAULT_SLIDING_FREQUENCY = "600";
     public static final String LENGTH_WINDOW = "length";
     public static final String LENGTH_BATCH_WINDOW = "lengthBatch";
@@ -84,6 +85,7 @@ public final class Constants {
     public static final String SCRIPT_FILE = "converted_hive_script";
     public static final String SCRIPT_NAME = "script";
     public static final String ANALYZER_PROPERTY_FILE = "analyzers.properties";
+    public static final String FUNCTION_CALL_PARAM = "functionCall";
 
     public static final String LENGTH_WINDOW_FREQUENCY = "lengthWndFrequency";
     public static final String LENGTH_WINDOW_BATCH_FREQUENCY = "lengthWndBatchFrequency";
@@ -91,7 +93,7 @@ public final class Constants {
     public static final String LENGTH_WINDOW_BATCH_FREQUENCY_TIME = "2000";
 
 
-    public static final String ANALYZER_STRING = "analyzer resolvePath(path=\"file://${CARBON_HOME}/repository/components/lib/udf_SiddhiHive.jar);";
+    public static final String ANALYZER_STRING = "analyzer resolvePath(path=\"file://${CARBON_HOME}/repository/components/lib/udf_SiddhiHive.jar\");";
     public static final String HIVE_AUX_JAR    = "set hive.aux.jars.path=${hiveconf:FILE_PATH};";
     public static final String TEMP_FUNCTION   = "create temporary function setCounterAndTimestamp as 'org.wso2.siddhihive.udfunctions.UDFIncrementalCounter';";
     public static final String EXECUTION_INITIALIZER   ="class org.wso2.siddhihive.analytics.ScriptExecutionInitializer;";

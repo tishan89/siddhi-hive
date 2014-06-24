@@ -38,6 +38,7 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
     private String firstSelectClause;
     private String secondSelectClause;
     private String wndSubQueryIdentifier = null;
+    private String functionCall = null;
 
 
     public LengthBatchWindowStreamHandler() {
@@ -58,8 +59,11 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
         invokeGenerateWhereClause(windowStream.getFilter());
         fromClause = assembleWindowFromClause(); //  from
         result = new HashMap<String, String>();
-        result.put(Constants.LENGTH_WIND_FROM_QUERY, fromClause);
+        result.put(Constants.LENGTH_BATCH_WIND_FROM_QUERY, fromClause);
         result.put(Constants.INITALIZATION_SCRIPT, initializationScript);
+
+        if(functionCall != null )
+            result.put(Constants.FUNCTION_CALL_PARAM, functionCall);
 
         result.put(Constants.LENGTH_WINDOW_BATCH_FREQUENCY,schedulingFreq);
         //getSiddhiHiveManager().setWindowProcessingState(WindowProcessingState.WINDOW_PROCESSED);
@@ -90,7 +94,7 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
                     params += " , " + streamID + "." + attribute.getName() + " ";
             }
 
-            params += ", " + streamID + "." + Constants.TIMESTAMPS_COLUMN + "  ,  " + " setCounterAndTimestamp( TIMESTAMP_" + context.generateTimeStampCounter(false) +", "+ streamID + "." + Constants.TIMESTAMPS_COLUMN + " )";
+            params += ", " + streamID + "." + Constants.TIMESTAMPS_COLUMN + "  " ;
         }
 
         if(params.isEmpty())
@@ -105,8 +109,13 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
 
         Context context = StateManager.getContext();
 
+        Expression expression = windowStream.getWindow().getParameters()[0];
+        IntConstant intConstant = (IntConstant)expression;
+        int length = intConstant.getValue();
+
+
         String orderBY = Constants.ORDER_BY + "  " + windowStream.getStreamId() + "." + Constants.TIMESTAMPS_COLUMN + "   " + "ASC" + "\n";
-        String limit = "LIMIT ${hiveconf:LIMIT_COUNT_"+context.generateLimitCounter(false)+"}"+ "\n";
+        String limit = "LIMIT " +  length + "\n";
         return orderBY + limit ;
     }
 
@@ -116,6 +125,7 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
 
         context.generateTimeStampCounter(true);
         context.generateLimitCounter(true);
+        StateManager.setContext(context);
 
         if(context.getIsScheduled() == false){
             Expression expression = windowStream.getWindow().getParameters()[0];
@@ -125,13 +135,17 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
             long time = 1402315118124l;
 
 
-            String timeStamp = "set TIME_STAMP_" + context.generateTimeStampCounter(false)+"=" + String.valueOf(time) +";" + "\n";
-            String maxLimit = "set MAX_LIMIT_" + context.generateLimitCounter(false) + "=" + length +";"+ "\n";
-            String limitCount = "set LIMIT_COUNT__" + context.generateLimitCounter(false) + "=" + length +";"+ "\n";
+           // String timeStamp = "set TIME_STAMP_" + context.generateTimeStampCounter(false)+"=" + String.valueOf(time) +";" + "\n";//INITIAL_TIMESTAMP
+            String timeStamp = "set INITIAL_TIMESTAMP_" + context.generateTimeStampCounter(false)+"=" + String.valueOf(time) +";" + "\n";
+            //String maxLimit = "set MAX_LIMIT_" + context.generateLimitCounter(false) + "=" + length +";"+ "\n";
+            String maxLimit = "set MAX_LIMIT_COUNT_" + context.generateLimitCounter(false) + "=" + length +";"+ "\n";
+            String totalTimeStampCount = "set TOTAL_TIME_STAMP_COUNT="+ context.generateTimeStampCounter(false)+";" + "\n";
+           // String totalLimitStampCount = "set TOTAL_LENGTH_COUNT="+ context.generateLimitCounter(false)+";" + "\n";
+            //String limitCount = "set LIMIT_COUNT__" + context.generateLimitCounter(false) + "=" + length +";"+ "\n";
 
-            return timeStamp + maxLimit + limitCount;
+            return timeStamp + maxLimit + totalTimeStampCount ;
         }
-        StateManager.setContext(context);
+
         return  " ";
     }
 
@@ -198,9 +212,9 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
         if( !streamID.equalsIgnoreCase(streamReferenceID))
             clauseIdentifier = streamReferenceID;
 
-        String fSelectClause = "SELECT * FROM ("
-                                    +selectParamsClause + "       " + Constants.FROM + "  " + this.windowStream.getStreamId() + "  " + " WHERE " + Constants.TIMESTAMPS_COLUMN + " > " +
-                                     "${hiveconf:TIME_STAMP_"+context.generateTimeStampCounter(false) + "}" + "\n" + limitClause + ")" + clauseIdentifier;
+        String fSelectClause = "SELECT * "+ " FROM (" +
+                                    selectParamsClause + "       " + Constants.FROM + "  " + this.windowStream.getStreamId() + "  " + " WHERE " + Constants.TIMESTAMPS_COLUMN + " > " +
+                                     "${hiveconf:TIMESTAMP_TO_BE_PROCESSESED_"+context.generateTimeStampCounter(false) + "}" + "\n" + limitClause + ")" + clauseIdentifier;
 
         return fSelectClause;
     }
@@ -243,6 +257,8 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
         context.setReferenceIDAlias(this.windowStream.getStreamReferenceId(), aliasID);
        // getSiddhiHiveManager().addCachedValues("STREAM_ID", aliasID); 
         StateManager.setContext(context);
+
+        this.functionCall = " setCounterAndTimestamp( " + context.generateTimeStampCounter(false) +", "+ aliasID + "." + Constants.TIMESTAMPS_COLUMN + " )";
 
         return Constants.FROM + "  " + Constants.OPENING_BRACT + "   " + secondSelectClause + "\n" + whereClause + Constants.CLOSING_BRACT + aliasID ;
     }
