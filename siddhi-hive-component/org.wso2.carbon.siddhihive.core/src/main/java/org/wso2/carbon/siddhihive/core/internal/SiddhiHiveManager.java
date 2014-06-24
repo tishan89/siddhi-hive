@@ -280,19 +280,6 @@ public class SiddhiHiveManager {
             inputCreate += "\n";
         }
 
-        if (headerMap.get(Constants.TIME_WINDOW_FREQUENCY) != null && !isScheduled) {
-            isScheduled = true;
-            schedule(Long.valueOf(headerMap.get(Constants.TIME_WINDOW_FREQUENCY)).longValue());
-        } else if ( ( (concurrentSelectorMap.get(Constants.LENGTH_WINDOW_FREQUENCY) != null) ||  ( (concurrentSelectorMap.get(Constants.LENGTH_WINDOW_BATCH_FREQUENCY) != null)   ) ) && !isScheduled) {
-            isScheduled = true;
-            long scheduleTime = getScheduleTime(concurrentSelectorMap, Constants.LENGTH_WINDOW_FREQUENCY, Constants.LENGTH_WINDOW_BATCH_FREQUENCY);
-            schedule(scheduleTime);
-        }else if ( ( (headerMap.get(Constants.LENGTH_WINDOW_FREQUENCY) != null) ||  ( (headerMap.get(Constants.LENGTH_WINDOW_BATCH_FREQUENCY) != null)   ) ) && !isScheduled) {
-            isScheduled = true;
-            long scheduleTime = getScheduleTime(headerMap, Constants.LENGTH_WINDOW_FREQUENCY, Constants.LENGTH_WINDOW_BATCH_FREQUENCY);
-            schedule(scheduleTime);
-        }
-
 
         String fromClause = headerMap.get(Constants.FROM_CLAUSE);
         if (fromClause == null)
@@ -334,6 +321,18 @@ public class SiddhiHiveManager {
 
         context.reset();
         StateManager.setContext(context);
+        if (headerMap.get(Constants.TIME_WINDOW_FREQUENCY) != null && !isScheduled) {
+            isScheduled = true;
+            schedule(Long.valueOf(headerMap.get(Constants.TIME_WINDOW_FREQUENCY)).longValue());
+        } else if (((concurrentSelectorMap.get(Constants.LENGTH_WINDOW_FREQUENCY) != null) || ((concurrentSelectorMap.get(Constants.LENGTH_WINDOW_BATCH_FREQUENCY) != null))) && !isScheduled) {
+            isScheduled = true;
+            long scheduleTime = getScheduleTime(concurrentSelectorMap, Constants.LENGTH_WINDOW_FREQUENCY, Constants.LENGTH_WINDOW_BATCH_FREQUENCY);
+            schedule(scheduleTime);
+        } else if (((headerMap.get(Constants.LENGTH_WINDOW_FREQUENCY) != null) || ((headerMap.get(Constants.LENGTH_WINDOW_BATCH_FREQUENCY) != null))) && !isScheduled) {
+            isScheduled = true;
+            long scheduleTime = getScheduleTime(headerMap, Constants.LENGTH_WINDOW_FREQUENCY, Constants.LENGTH_WINDOW_BATCH_FREQUENCY);
+            schedule(scheduleTime);
+        }
         return hiveQuery;
 
     }
