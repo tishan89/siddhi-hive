@@ -41,6 +41,7 @@ public class LengthWindowStreamHandler extends WindowStreamHandler {
 
     private String firstSelectClause = null;
     private String secondSelectClause = null;
+    private String functionCall = null;
 
    // private int subqueryCounter = 0;
 
@@ -67,6 +68,11 @@ public class LengthWindowStreamHandler extends WindowStreamHandler {
         result.put(Constants.LENGTH_WIND_FROM_QUERY, fromClause);
         result.put(Constants.LENGTH_WINDOW_FREQUENCY,schedulingFreq);
 
+        if(functionCall != null ){
+            result.put(Constants.FUNCTION_CALL_PARAM, functionCall);
+
+        }
+
         finalizeWndVariable();
         return result;
     }
@@ -82,8 +88,14 @@ public class LengthWindowStreamHandler extends WindowStreamHandler {
 
         context.setReferenceIDAlias(this.windowStream.getStreamReferenceId(), aliasID);
 
+        String aliasID2 = context.generateSubQueryIdentifier();
+
+        this.functionCall = " setCounterAndTimestamp( " + context.generateTimeStampCounter(false) +", "+ aliasID2 + "." + Constants.TIMESTAMPS_COLUMN + " )";
+        result.put("ALIAS", aliasID2);
         StateManager.setContext(context);
+
         return Constants.FROM + "  " + Constants.OPENING_BRACT + "   " + firstSelectClause + "\n" + whereClause + Constants.CLOSING_BRACT + aliasID ;
+        //return Constants.FROM + "  " + Constants.OPENING_BRACT + "   " + firstSelectClause + "\n" + whereClause + Constants.CLOSING_BRACT + aliasID ;
 //        return Constants.FROM + "  " + Constants.OPENING_BRACT + "   " + selectParamsClause + " " + Constants.FROM  + "  " + windowStream.getStreamId()  + limitClause + "   " + Constants.CLOSING_BRACT + wndSubQueryIdentifier +
 //               "\n" + " " + whereClause + "  ";
     }

@@ -66,7 +66,7 @@ public class SelectorProcessorSample {
 
 
            String queryID = siddhiManager.addQuery(" from StockExchangeStream[symbol == \"Apple\"]#window.lengthBatch(10) \n" +
-                "join FastMovingStockQuotes#window.lengthBatch(15)  \n" +
+                "join FastMovingStockQuotes#window.time(15)  \n" +
                 " on StockExchangeStream.symbol == FastMovingStockQuotes.symbol  select *\n" +
                 "insert into JoinStream;");
 

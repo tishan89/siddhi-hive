@@ -98,4 +98,5 @@ public final class Constants {
     public static final String TEMP_FUNCTION   = "create temporary function setCounterAndTimestamp as 'org.wso2.siddhihive.udfunctions.UDFIncrementalCounter';";
     public static final String EXECUTION_INITIALIZER   ="class org.wso2.siddhihive.analytics.ScriptExecutionInitializer;";
     public static final String INITIALIZATION_STATEMENT = ANALYZER_STRING + "\n" + HIVE_AUX_JAR + "\n" + TEMP_FUNCTION + "\n" + EXECUTION_INITIALIZER + "\n";
+    public static final String EXECUTION_FINALIZER  ="class org.wso2.siddhihive.analytics.ScriptExecutionFinalizer";
 }

@@ -78,14 +78,32 @@ public class JoinStreamHandler implements StreamHandler {
             //StateManager.setContext(context);
         }
 
-        String appendingSelectPhrase = "select * from        ";
+        String appendingSelectPhrase = "select * from";
 
         if(mapLeftStream.get(Constants.LENGTH_BATCH_WIND_FROM_QUERY) != null){
             appendingSelectPhrase = mapLeftStream.get(Constants.FUNCTION_CALL_PARAM);
-            appendingSelectPhrase = "select *, " + appendingSelectPhrase + "  from      ";
+            appendingSelectPhrase = "select *, " + appendingSelectPhrase + "  from";
+
         }
 
-        String sQuery = "from (  " + appendingSelectPhrase + sLeftString + " "+ sJoin + " " + sRightString+ " ON   (" + sCondition + ")" + " ) "+  aliasID;
+//        if(mapRightStream.get(Constants.LENGTH_WIND_FROM_QUERY) != null){
+//            appendingSelectPhrase = mapRightStream.get(Constants.FUNCTION_CALL_PARAM);
+//            appendingSelectPhrase = " (select *, " + appendingSelectPhrase + "  from  (    ";
+//            String  rightStreamAlias = mapRightStream.get("ALIAS");
+//
+//            if(rightStreamAlias != null){
+//                rightStreamAlias = " )" + rightStreamAlias;
+//            }
+//
+//            sRightString = appendingSelectPhrase + sRightString + " ) "+ rightStreamAlias;
+//        }
+        //    if(mapRightStream.get(Constants.LENGTH_BATCH_WIND_FROM_QUERY) != null)
+
+        String sQuery = "from (  " + appendingSelectPhrase + " " + sLeftString + " "+ sJoin + " " + sRightString+ " ON   (" + sCondition + ")" + " ) "+  aliasID;
+        //String sQuery = "from (select * from " + sLeftString + " "+ sJoin + " " + sRightString+ " ON   (" + sCondition + ")" + " ) "+  aliasID;
+        StateManager.setContext(context);
+
+        //String sQuery = "from (  "  + sLeftString + " "+ sJoin + " " + sRightString+ " ON   (" + sCondition + ")" + " ) "+  aliasID;
         //String sQuery = "from (select * from " + sLeftString + " "+ sJoin + " " + sRightString+ " ON   (" + sCondition + ")" + " ) "+  aliasID;
         StateManager.setContext(context);
         result = new HashMap<String, String>();

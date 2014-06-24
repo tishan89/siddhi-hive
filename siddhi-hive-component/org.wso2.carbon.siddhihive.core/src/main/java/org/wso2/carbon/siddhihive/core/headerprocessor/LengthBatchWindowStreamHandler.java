@@ -46,6 +46,8 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
 
     public Map<String, String> process(Stream stream, Map<String, StreamDefinitionExt> streamDefinitions){
 
+        result = new HashMap<String, String>();
+
         this.windowStream = (WindowStream) stream;
         initializeWndVariables();
         schedulingFreq = String.valueOf(Constants.LENGTH_WINDOW_BATCH_FREQUENCY_TIME);
@@ -58,13 +60,13 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
 
         invokeGenerateWhereClause(windowStream.getFilter());
         fromClause = assembleWindowFromClause(); //  from
-        result = new HashMap<String, String>();
-        result.put(Constants.LENGTH_BATCH_WIND_FROM_QUERY, fromClause);
+
+        result.put(Constants.LENGTH_WIND_FROM_QUERY, fromClause);
         result.put(Constants.INITALIZATION_SCRIPT, initializationScript);
 
-        if(functionCall != null )
+        if(functionCall != null ){
             result.put(Constants.FUNCTION_CALL_PARAM, functionCall);
-
+        }
         result.put(Constants.LENGTH_WINDOW_BATCH_FREQUENCY,schedulingFreq);
         //getSiddhiHiveManager().setWindowProcessingState(WindowProcessingState.WINDOW_PROCESSED);
 
@@ -136,14 +138,14 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
 
 
            // String timeStamp = "set TIME_STAMP_" + context.generateTimeStampCounter(false)+"=" + String.valueOf(time) +";" + "\n";//INITIAL_TIMESTAMP
-            String timeStamp = "set INITIAL_TIMESTAMP_" + context.generateTimeStampCounter(false)+"=" + String.valueOf(time) +";" + "\n";
+            //String timeStamp = "set INITIAL_TIMESTAMP_" + context.generateTimeStampCounter(false)+"=" + String.valueOf(time) +";" + "\n";
             //String maxLimit = "set MAX_LIMIT_" + context.generateLimitCounter(false) + "=" + length +";"+ "\n";
             String maxLimit = "set MAX_LIMIT_COUNT_" + context.generateLimitCounter(false) + "=" + length +";"+ "\n";
             String totalTimeStampCount = "set TOTAL_TIME_STAMP_COUNT="+ context.generateTimeStampCounter(false)+";" + "\n";
            // String totalLimitStampCount = "set TOTAL_LENGTH_COUNT="+ context.generateLimitCounter(false)+";" + "\n";
             //String limitCount = "set LIMIT_COUNT__" + context.generateLimitCounter(false) + "=" + length +";"+ "\n";
 
-            return timeStamp + maxLimit + totalTimeStampCount ;
+            return maxLimit + totalTimeStampCount ;
         }
 
         return  " ";
@@ -259,6 +261,7 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
         StateManager.setContext(context);
 
         this.functionCall = " setCounterAndTimestamp( " + context.generateTimeStampCounter(false) +", "+ aliasID + "." + Constants.TIMESTAMPS_COLUMN + " )";
+        result.put("ALIAS", aliasID);
 
         return Constants.FROM + "  " + Constants.OPENING_BRACT + "   " + secondSelectClause + "\n" + whereClause + Constants.CLOSING_BRACT + aliasID ;
     }
