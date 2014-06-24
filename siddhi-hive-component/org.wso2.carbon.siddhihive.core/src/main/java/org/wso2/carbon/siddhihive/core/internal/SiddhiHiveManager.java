@@ -314,8 +314,11 @@ public class SiddhiHiveManager {
 
         String incrementalClause = headerMap.get(Constants.INCREMENTAL_CLAUSE);
 
-        if (incrementalClause == null)
+        if (incrementalClause == null) {
             incrementalClause = " ";
+        } else {
+            incrementalEnabled = true;
+        }
 
        // hiveQuery = outputQuery + "\n" + incrementalClause + "\n" + fromClause + "\n " + selectQuery + "\n " + groupByQuery + "\n " + havingQuery + "\n " + whereClause + "\n ";
         hiveQuery = initializationScript  +  inputCreate + "\n" + outputCreate +"\n" + incrementalClause + "\n" + "\n" +  Constants.INITIALIZATION_STATEMENT + "\n" + outputInsertQuery + "\n" + selectQuery + "\n " + fromClause + "\n " +whereClause + "\n " + groupByQuery + "\n " + havingQuery + "\n " +";";
