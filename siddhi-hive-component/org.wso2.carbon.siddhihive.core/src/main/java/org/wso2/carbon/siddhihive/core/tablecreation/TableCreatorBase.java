@@ -67,5 +67,6 @@ public abstract class TableCreatorBase {
         for (int i = 1; i < listColumns.size(); i++) {
             sHiveColumns += (", " + listColumns.get(i).getFieldName() + " " + listColumns.get(i).getDataType());
         }
+        sHiveColumns += (", timestamps BIGINT") ;
     }
 }

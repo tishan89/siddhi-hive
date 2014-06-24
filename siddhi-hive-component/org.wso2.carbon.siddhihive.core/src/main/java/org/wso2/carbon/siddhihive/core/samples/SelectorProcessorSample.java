@@ -25,7 +25,7 @@ public class SelectorProcessorSample {
         SiddhiManager siddhiManager = new SiddhiManager();
 
         siddhiManager.defineStream("define stream StockExchangeStream ( symbol string, price int )");
-        siddhiManager.defineStream("define stream StockQuote ( symbol string, avgPrice double )");
+        siddhiManager.defineStream("define stream FastMovingStockQuotes ( symbol string, avgPrice double )");
 //        String queryID = siddhiManager.addQuery(" from StockExchangeStream[price >= 20]#window.length(50) " +
 //                                                " select symbol, avg(price) as avgPrice " +
 //                " group by symbol having avgPrice > 50 " +
@@ -65,9 +65,9 @@ public class SelectorProcessorSample {
 
 
 
-           String queryID = siddhiManager.addQuery(" from StockExchangeStream[symbol == \"IBM\"]#window.lengthBatch(6000) \n" +
-                "join StockQuote#window.lengthBatch(500)  \n" +
-                " on StockExchangeStream.symbol == StockQuote.symbol  select *\n" +
+           String queryID = siddhiManager.addQuery(" from StockExchangeStream[symbol == \"Apple\"]#window.lengthBatch(10) \n" +
+                "join FastMovingStockQuotes#window.lengthBatch(15)  \n" +
+                " on StockExchangeStream.symbol == FastMovingStockQuotes.symbol  select *\n" +
                 "insert into JoinStream;");
 
 
@@ -76,9 +76,6 @@ public class SelectorProcessorSample {
 
         List<StreamDefinition> streamDefinitionList = siddhiManager.getStreamDefinitions();
         List<StreamDefinitionExt> streamDefinitionExtList = new ArrayList<StreamDefinitionExt>() ;
-
-
-
 
         for (int i = 0; i < streamDefinitionList.size(); ++i) {
 

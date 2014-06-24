@@ -1,8 +1,10 @@
 package org.wso2.carbon.siddhihive.core.headerprocessor;
 
+import org.wso2.carbon.siddhihive.core.configurations.Context;
 import org.wso2.carbon.siddhihive.core.configurations.StreamDefinitionExt;
 import org.wso2.carbon.siddhihive.core.handler.ConditionHandler;
 import org.wso2.carbon.siddhihive.core.internal.SiddhiHiveManager;
+import org.wso2.carbon.siddhihive.core.internal.StateManager;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
 import org.wso2.carbon.siddhihive.core.utils.Conversions;
 import org.wso2.siddhi.query.api.query.input.BasicStream;
@@ -41,15 +43,51 @@ public class JoinStreamHandler implements StreamHandler {
         String sLeftString = mapLeftStream.get(Constants.FROM_CLAUSE);
         if (sLeftString == null)
             sLeftString = mapLeftStream.get(Constants.LENGTH_WIND_FROM_QUERY);
+        if(sLeftString == null)
+            sLeftString = mapLeftStream.get(Constants.LENGTH_BATCH_WIND_FROM_QUERY);
+
         sLeftString = sLeftString.replaceFirst(Constants.FROM+" ", "");
 
         String sRightString = mapRightStream.get(Constants.FROM_CLAUSE);
         if (sRightString == null)
             sRightString = mapRightStream.get(Constants.LENGTH_WIND_FROM_QUERY);
+        if(sRightString == null)
+            sRightString = mapRightStream.get(Constants.LENGTH_BATCH_WIND_FROM_QUERY);
+
         sRightString = sRightString.replaceFirst(Constants.FROM+" ", "");
 
-        String sQuery = "from (select * from " + sLeftString + " "+ sJoin + " " + sRightString+ " ON " + sCondition + ")";
+        String aliasID = "";
 
+        Context context = StateManager.getContext();
+        if(joinStream.getLeftStream() instanceof WindowStream){
+
+            WindowStream windowStream = (WindowStream) joinStream.getLeftStream();
+            aliasID =  context.generateSubQueryIdentifier();
+            context.setReferenceIDAlias(windowStream.getStreamReferenceId(), aliasID);
+           // StateManager.setContext(context);
+
+        }
+
+        if(joinStream.getRightStream() instanceof WindowStream){
+            WindowStream windowStream = (WindowStream) joinStream.getRightStream();
+
+            if(aliasID.isEmpty() == true){
+                aliasID =  context.generateSubQueryIdentifier();
+            }
+            context.setReferenceIDAlias(windowStream.getStreamReferenceId(), aliasID);
+            //StateManager.setContext(context);
+        }
+
+        String appendingSelectPhrase = "select * from        ";
+
+        if(mapLeftStream.get(Constants.LENGTH_BATCH_WIND_FROM_QUERY) != null){
+            appendingSelectPhrase = mapLeftStream.get(Constants.FUNCTION_CALL_PARAM);
+            appendingSelectPhrase = "select *, " + appendingSelectPhrase + "  from      ";
+        }
+
+        String sQuery = "from (  " + appendingSelectPhrase + sLeftString + " "+ sJoin + " " + sRightString+ " ON   (" + sCondition + ")" + " ) "+  aliasID;
+        //String sQuery = "from (select * from " + sLeftString + " "+ sJoin + " " + sRightString+ " ON   (" + sCondition + ")" + " ) "+  aliasID;
+        StateManager.setContext(context);
         result = new HashMap<String, String>();
 
         String leftInitializationScript = mapLeftStream.get(Constants.INITALIZATION_SCRIPT);

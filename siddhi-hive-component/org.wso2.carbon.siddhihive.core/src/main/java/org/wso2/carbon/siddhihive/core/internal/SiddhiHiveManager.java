@@ -2,25 +2,24 @@ package org.wso2.carbon.siddhihive.core.internal;
 
 
 import org.apache.log4j.Logger;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.event.stream.manager.core.exception.EventStreamConfigurationException;
 import org.wso2.carbon.siddhihive.core.configurations.Context;
 import org.wso2.carbon.siddhihive.core.configurations.StreamDefinitionExt;
 import org.wso2.carbon.siddhihive.core.headerprocessor.HeaderHandler;
-import org.wso2.carbon.siddhihive.core.internal.ds.SiddhiHiveValueHolder;
 import org.wso2.carbon.siddhihive.core.tablecreation.CSVTableCreator;
 import org.wso2.carbon.siddhihive.core.selectorprocessor.QuerySelectorProcessor;
 import org.wso2.carbon.siddhihive.core.tablecreation.CassandraTableCreator;
 import org.wso2.carbon.siddhihive.core.tablecreation.TableCreatorBase;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
-import org.wso2.carbon.siddhihive.core.utils.SiddhiHiveToolBoxCreator;
 import org.wso2.carbon.siddhihive.core.utils.enums.*;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.query.Query;
 import org.wso2.siddhi.query.api.query.input.Stream;
 import org.wso2.siddhi.query.api.query.output.stream.OutStream;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -38,8 +37,8 @@ public class SiddhiHiveManager {
     //private Map<String, String> inputStreamReferenceIDMap= null;// map to maintain both the stream ID and stream reference ID
 
     private Map<String, String> inputStreamGeneratedQueryMap = null; // reference ID <-----> Replacement generatedQueryID
-    private Map<String, String> cachedValuesMap = null; //parent refernce
-    // private Map<String, String> inputStreamGeneratedQueryMap= null; // reference ID <-----> Replacement generatedQueryID
+    private Map<String, String> cachedValuesMap= null; //parent refernce
+   // private Map<String, String> inputStreamGeneratedQueryMap= null; // reference ID <-----> Replacement generatedQueryID
 
     private ProcessingLevel processingLevel;
     private InputStreamProcessingLevel inputStreamProcessingLevel;
@@ -284,11 +283,11 @@ public class SiddhiHiveManager {
         if (headerMap.get(Constants.TIME_WINDOW_FREQUENCY) != null && !isScheduled) {
             isScheduled = true;
             schedule(Long.valueOf(headerMap.get(Constants.TIME_WINDOW_FREQUENCY)).longValue());
-        } else if (((concurrentSelectorMap.get(Constants.LENGTH_WINDOW_FREQUENCY) != null) || ((concurrentSelectorMap.get(Constants.LENGTH_WINDOW_BATCH_FREQUENCY) != null))) && !isScheduled) {
+        } else if ( ( (concurrentSelectorMap.get(Constants.LENGTH_WINDOW_FREQUENCY) != null) ||  ( (concurrentSelectorMap.get(Constants.LENGTH_WINDOW_BATCH_FREQUENCY) != null)   ) ) && !isScheduled) {
             isScheduled = true;
             long scheduleTime = getScheduleTime(concurrentSelectorMap, Constants.LENGTH_WINDOW_FREQUENCY, Constants.LENGTH_WINDOW_BATCH_FREQUENCY);
             schedule(scheduleTime);
-        } else if (((headerMap.get(Constants.LENGTH_WINDOW_FREQUENCY) != null) || ((headerMap.get(Constants.LENGTH_WINDOW_BATCH_FREQUENCY) != null))) && !isScheduled) {
+        }else if ( ( (headerMap.get(Constants.LENGTH_WINDOW_FREQUENCY) != null) ||  ( (headerMap.get(Constants.LENGTH_WINDOW_BATCH_FREQUENCY) != null)   ) ) && !isScheduled) {
             isScheduled = true;
             long scheduleTime = getScheduleTime(headerMap, Constants.LENGTH_WINDOW_FREQUENCY, Constants.LENGTH_WINDOW_BATCH_FREQUENCY);
             schedule(scheduleTime);
@@ -298,6 +297,9 @@ public class SiddhiHiveManager {
         String fromClause = headerMap.get(Constants.FROM_CLAUSE);
         if (fromClause == null)
             fromClause = headerMap.get(Constants.LENGTH_WIND_FROM_QUERY);
+        else
+            fromClause = headerMap.get(Constants.LENGTH_BATCH_WIND_FROM_QUERY);
+
         if (fromClause == null)
             fromClause = headerMap.get(Constants.JOIN_CLAUSE);
 
@@ -306,7 +308,7 @@ public class SiddhiHiveManager {
         if (initializationScript == null)
             initializationScript = " ";
 
-        String selectQuery = "SELECT " + concurrentSelectorMap.get(Constants.SELECTION_QUERY);
+        String selectQuery = "SELECT \'Dummy Key\', " + concurrentSelectorMap.get(Constants.SELECTION_QUERY);
         String groupByQuery = concurrentSelectorMap.get(Constants.GROUP_BY_QUERY);
 
         if (groupByQuery == null)
@@ -324,22 +326,12 @@ public class SiddhiHiveManager {
 
         String incrementalClause = headerMap.get(Constants.INCREMENTAL_CLAUSE);
 
-        if (incrementalClause == null) {
+        if (incrementalClause == null)
             incrementalClause = " ";
-        } else {
-            incrementalEnabled = true;
-        }
 
-        // hiveQuery = outputQuery + "\n" + incrementalClause + "\n" + fromClause + "\n " + selectQuery + "\n " + groupByQuery + "\n " + havingQuery + "\n " + whereClause + "\n ";
-        hiveQuery = Constants.INITIALIZATION_STATEMENT + inputCreate + "\n" + outputCreate + "\n" + outputInsertQuery + "\n" + incrementalClause + "\n" + initializationScript + "\n" + selectQuery + "\n " + fromClause + "\n " + whereClause + "\n " + groupByQuery + "\n " + havingQuery + "\n ";
-        List<String> streamDefs = new ArrayList<String>();
-        for (Map.Entry entry : streamDefinitionMap.entrySet()) {
-            if (isInputStream((StreamDefinitionExt) entry.getValue())) {
-                streamDefs.add(getOriginalStreamDefinition((StreamDefinitionExt) entry.getValue()));
-            }
-        }
-        SiddhiHiveToolBoxCreator siddhiHiveToolBoxCreator = new SiddhiHiveToolBoxCreator(streamDefs, hiveQuery);
-        siddhiHiveToolBoxCreator.createToolBox(incrementalEnabled);
+       // hiveQuery = outputQuery + "\n" + incrementalClause + "\n" + fromClause + "\n " + selectQuery + "\n " + groupByQuery + "\n " + havingQuery + "\n " + whereClause + "\n ";
+        hiveQuery = initializationScript  +  inputCreate + "\n" + outputCreate +"\n" + incrementalClause + "\n" + "\n" +  Constants.INITIALIZATION_STATEMENT + "\n" + outputInsertQuery + "\n" + selectQuery + "\n " + fromClause + "\n " +whereClause + "\n " + groupByQuery + "\n " + havingQuery + "\n " +";";
+
         context.reset();
         StateManager.setContext(context);
         return hiveQuery;
@@ -360,7 +352,7 @@ public class SiddhiHiveManager {
         timer.scheduleAtFixedRate(timerTask, timeInMillis, timeInMillis);
     }
 
-    private long getScheduleTime(Map<String, String> timeMap, String frequency, String batchFrequency) {
+    private long getScheduleTime(Map<String, String> timeMap, String frequency, String batchFrequency){
 
         String scheduleTime = null;
         String batchScheduleTime = null;
@@ -373,47 +365,22 @@ public class SiddhiHiveManager {
 
         long scheduleFinalValue = 0l;
 
-        if ((scheduleTime != null) && (batchScheduleTime != null)) {
+        if( (scheduleTime != null) && (batchScheduleTime != null) ){
 
             scheduleValue = Long.valueOf(scheduleTime).longValue();
             batchScheduleValue = Long.valueOf(batchScheduleTime).longValue();
 
-            if (scheduleValue > batchScheduleValue)
+            if(scheduleValue > batchScheduleValue)
                 scheduleFinalValue = batchScheduleValue;
             else
                 scheduleFinalValue = scheduleValue;
-        } else if (scheduleTime != null) {
-            scheduleFinalValue = Long.valueOf(scheduleTime).longValue();
-        } else if (batchScheduleTime != null) {
-            scheduleFinalValue = Long.valueOf(batchScheduleTime).longValue();
+        }else if(scheduleTime != null){
+            scheduleFinalValue =  Long.valueOf(scheduleTime).longValue();
+        }else if(batchScheduleTime != null){
+            scheduleFinalValue =  Long.valueOf(batchScheduleTime).longValue();
         }
 
         return scheduleFinalValue;
-    }
-
-    private Boolean isInputStream(StreamDefinitionExt streamDefinitionExt) {
-        if (streamDefinitionExt.getFullQualifiedStreamID().equals(streamDefinitionExt.getStreamDefinition().getStreamId())) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    private String getOriginalStreamDefinition(StreamDefinitionExt streamDefinitionExt) {
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        String streamId = streamDefinitionExt.getFullQualifiedStreamID();
-        org.wso2.carbon.databridge.commons.StreamDefinition streamDefinition = null;
-        try {
-            streamDefinition = SiddhiHiveValueHolder.getInstance().getEventStreamService().getStreamDefinition(streamId, tenantId);
-        } catch (EventStreamConfigurationException e) {
-            e.printStackTrace();
-        }
-        if (streamDefinition != null) {
-            return streamDefinition.toString();
-        } else {
-            log.error("No stream definition found for stream id " + streamId);
-            return null;
-        }
     }
 
 
