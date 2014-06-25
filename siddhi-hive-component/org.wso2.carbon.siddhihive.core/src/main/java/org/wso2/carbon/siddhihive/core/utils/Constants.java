@@ -91,7 +91,7 @@ public final class Constants {
     public static final String DEFAULT_LENGTH_WINDOW_FREQUENCY_TIME = "600";
     public static final String DEFAULT_LENGTH_WINDOW_BATCH_FREQUENCY_TIME = "2000";
     public static final String TIME_WINDOW_FREQUENCY = "timeWindowFrequency";
-    public static final String TIME_BATCH_WINDOW_FREQUENCY = "timeWindowFrequency";
+    public static final String TIME_BATCH_WINDOW_FREQUENCY = "timeBatchWindowFrequency";
     public static final String DEFAULT_SLIDING_FREQUENCY = "10000";
 
     public static final String ANALYZER_STRING = "analyzer resolvePath(path=\"file://${CARBON_HOME}/repository/components/lib/udf_SiddhiHive.jar\");";
