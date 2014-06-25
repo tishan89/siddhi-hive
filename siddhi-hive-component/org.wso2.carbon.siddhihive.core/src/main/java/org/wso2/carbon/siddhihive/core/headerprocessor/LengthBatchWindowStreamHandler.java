@@ -38,7 +38,8 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
     private String firstSelectClause;
     private String secondSelectClause;
     private String wndSubQueryIdentifier = null;
-    private String functionCall = null;
+    private String leftJoinfunctionCall = null;
+    private String rightJoinfunctionCall = null;
 
 
     public LengthBatchWindowStreamHandler() {
@@ -61,12 +62,15 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
         invokeGenerateWhereClause(windowStream.getFilter());
         fromClause = assembleWindowFromClause(); //  from
 
-        result.put(Constants.LENGTH_WIND_FROM_QUERY, fromClause);
+        result.put(Constants.LENGTH_BATCH_WIND_FROM_QUERY, fromClause);
         result.put(Constants.INITALIZATION_SCRIPT, initializationScript);
 
-        if(functionCall != null ){
-            result.put(Constants.FUNCTION_CALL_PARAM, functionCall);
-        }
+        if(leftJoinfunctionCall != null )
+            result.put(Constants.FUNCTION_JOIN_LEFT_CALL_PARAM, leftJoinfunctionCall);
+
+        if(rightJoinfunctionCall != null)
+          result.put(Constants.FUNCTION_JOIN_RIGHT_CALL_PARAM, rightJoinfunctionCall);
+
         result.put(Constants.LENGTH_WINDOW_BATCH_FREQUENCY,schedulingFreq);
         //getSiddhiHiveManager().setWindowProcessingState(WindowProcessingState.WINDOW_PROCESSED);
 
@@ -256,12 +260,13 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
         Context context = StateManager.getContext();
 
         String aliasID = context.generateSubQueryIdentifier();
+        String prveiousAliasID = context.generatePreviousSubQueryIdentifier();
         context.setReferenceIDAlias(this.windowStream.getStreamReferenceId(), aliasID);
-       // getSiddhiHiveManager().addCachedValues("STREAM_ID", aliasID); 
-        StateManager.setContext(context);
 
-        this.functionCall = " setCounterAndTimestamp( " + context.generateTimeStampCounter(false) +", "+ aliasID + "." + Constants.TIMESTAMPS_COLUMN + " )";
-        result.put("ALIAS", aliasID);
+        StateManager.setContext(context);
+//FUNCTION_JOIN_RIGHT_CALL_PARAM
+        this.leftJoinfunctionCall = " setCounterAndTimestamp( " + context.generateTimeStampCounter(false) +", "+ aliasID + "." + Constants.TIMESTAMPS_COLUMN + " )";
+        this.rightJoinfunctionCall = " setCounterAndTimestamp( " + context.generateTimeStampCounter(false) +", "+ prveiousAliasID + "." + Constants.TIMESTAMPS_COLUMN + " )";
 
         return Constants.FROM + "  " + Constants.OPENING_BRACT + "   " + secondSelectClause + "\n" + whereClause + Constants.CLOSING_BRACT + aliasID ;
     }
