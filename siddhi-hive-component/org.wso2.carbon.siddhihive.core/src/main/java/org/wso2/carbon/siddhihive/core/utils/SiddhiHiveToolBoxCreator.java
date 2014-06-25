@@ -22,7 +22,7 @@ public class SiddhiHiveToolBoxCreator {
     private SiddhiHiveToolBoxCreator() {
     }
 
-    public void createToolBox(Boolean incrementalProcessingEnabled) {
+    public void createToolBox(Boolean incrementalProcessingEnabled, Long schedulingTime) {
         File parentDir = new File(Constants.TOOL_BOX_DIRECTORY);
         parentDir.mkdirs();
         File streamDir = new File(parentDir, Constants.STREAM_DEF_DIRECTORY);
@@ -44,7 +44,7 @@ public class SiddhiHiveToolBoxCreator {
 
         writeToFile(analyticDir, Constants.SCRIPT_FILE, script);
         String analyzerProp;
-        analyzerProp = getAnalyzerProperties(Constants.SCRIPT_NAME, Constants.SCRIPT_FILE);
+        analyzerProp = getAnalyzerProperties(Constants.SCRIPT_NAME, Constants.SCRIPT_FILE, schedulingTime);
         writeToFile(analyticDir, Constants.ANALYZER_PROPERTY_FILE, analyzerProp);
 
         ZipppingUtil zipppingUtil = new ZipppingUtil();
@@ -70,11 +70,16 @@ public class SiddhiHiveToolBoxCreator {
         return defList + "\n" + propertyString;
     }
 
-    public String getAnalyzerProperties(String scriptName, String fileName) {
+    public String getAnalyzerProperties(String scriptName, String fileName, Long schedulingTime) {
         String scriptNameLine = Constants.ANALYZER_SCRIPTS + "=" + scriptName;
         List<String> propList = new ArrayList<String>();
         propList.add(Constants.ANALYZER_SCRIPTS + "." + scriptName + "." + Constants.FILE_NAME + "=" + fileName);
         propList.add(Constants.ANALYZER_SCRIPTS + "." + scriptName + "." + Constants.DESCRIPTION + "=" + Constants.DEFAULT_ANALYZER_DESCRIPTION);
+        if (schedulingTime > 0) {
+            CronExpressionCreator cronExpressionCreator = new CronExpressionCreator();
+            String cron = cronExpressionCreator.getCronExpression(schedulingTime);
+            propList.add(Constants.ANALYZER_SCRIPTS + "." + scriptName + "." + Constants.CRON + "=" + cron);
+        }
         String prop = (StringUtils.join(propList, "\n"));
         return scriptNameLine + "\n" + prop;
     }
