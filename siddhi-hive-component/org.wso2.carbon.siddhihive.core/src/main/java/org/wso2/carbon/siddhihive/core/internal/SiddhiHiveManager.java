@@ -279,7 +279,7 @@ public class SiddhiHiveManager {
         for (int j = 0; j < arrCreate.length; j++) {
             inputCreate += arrCreate[j];
             inputCreate += "\n";
-        }
+        }       
 
 
         String fromClause = headerMap.get(Constants.FROM_CLAUSE);

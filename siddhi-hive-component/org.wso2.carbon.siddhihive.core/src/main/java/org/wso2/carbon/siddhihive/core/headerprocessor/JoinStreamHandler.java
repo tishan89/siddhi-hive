@@ -3,7 +3,6 @@ package org.wso2.carbon.siddhihive.core.headerprocessor;
 import org.wso2.carbon.siddhihive.core.configurations.Context;
 import org.wso2.carbon.siddhihive.core.configurations.StreamDefinitionExt;
 import org.wso2.carbon.siddhihive.core.handler.ConditionHandler;
-import org.wso2.carbon.siddhihive.core.internal.SiddhiHiveManager;
 import org.wso2.carbon.siddhihive.core.internal.StateManager;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
 import org.wso2.carbon.siddhihive.core.utils.Conversions;
@@ -11,7 +10,6 @@ import org.wso2.siddhi.query.api.query.input.BasicStream;
 import org.wso2.siddhi.query.api.query.input.JoinStream;
 import org.wso2.siddhi.query.api.query.input.Stream;
 import org.wso2.siddhi.query.api.query.input.WindowStream;
-import org.wso2.siddhi.query.compiler.SiddhiQLGrammarParser;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -78,14 +76,64 @@ public class JoinStreamHandler implements StreamHandler {
             //StateManager.setContext(context);
         }
 
-        String appendingSelectPhrase = "select * from        ";
+        String appendingLeftSelectPhrase = "select * from";
+        String appendingRightSelectPhrase = " ";
 
         if(mapLeftStream.get(Constants.LENGTH_BATCH_WIND_FROM_QUERY) != null){
-            appendingSelectPhrase = mapLeftStream.get(Constants.FUNCTION_CALL_PARAM);
-            appendingSelectPhrase = "select *, " + appendingSelectPhrase + "  from      ";
+            appendingLeftSelectPhrase = mapLeftStream.get(Constants.FUNCTION_JOIN_LEFT_CALL_PARAM);
+            appendingLeftSelectPhrase = "select *, " + appendingLeftSelectPhrase + "  from";
+
         }
 
-        String sQuery = "from (  " + appendingSelectPhrase + sLeftString + " "+ sJoin + " " + sRightString+ " ON   (" + sCondition + ")" + " ) "+  aliasID;
+
+
+        if(mapRightStream.get(Constants.LENGTH_BATCH_WIND_FROM_QUERY) != null){
+            appendingRightSelectPhrase = mapRightStream.get(Constants.FUNCTION_JOIN_RIGHT_CALL_PARAM);
+
+            int count = 0;
+            for(int i =0; i < sRightString.length(); i++){
+                if(sRightString.charAt(i) != '*')
+                    count++;
+                else
+                    break;
+            }
+
+            //int starStringIndex = sRightString.indexOf("\\*");
+
+            String s1 = sRightString.substring(0,count+1);
+            String s2 = sRightString.substring(count+1,sRightString.length());
+
+            sRightString =  s1 + " , " + appendingRightSelectPhrase + " " + " as ABC " + s2;
+
+//            String[] rightStreamSplit = sRightString.split("\\*");
+//            rightStreamSplit[0] = rightStreamSplit[0] + appendingRightSelectPhrase + " " + " as ABC ";
+//
+//            sRightString = " ";
+//
+//            for(int i = 0; i < rightStreamSplit.length; i++){
+//                sRightString += rightStreamSplit[i];
+//            }
+
+        }
+
+//        if(mapRightStream.get(Constants.LENGTH_WIND_FROM_QUERY) != null){
+//            appendingLeftSelectPhrase = mapRightStream.get(Constants.FUNCTION_JOIN_LEFT_CALL_PARAM);
+//            appendingLeftSelectPhrase = " (select *, " + appendingLeftSelectPhrase + "  from  (    ";
+//            String  rightStreamAlias = mapRightStream.get("ALIAS");
+//
+//            if(rightStreamAlias != null){
+//                rightStreamAlias = " )" + rightStreamAlias;
+//            }
+//
+//            sRightString = appendingLeftSelectPhrase + sRightString + " ) "+ rightStreamAlias;
+//        }
+        //    if(mapRightStream.get(Constants.LENGTH_BATCH_WIND_FROM_QUERY) != null)
+
+        String sQuery = "from (  " + appendingLeftSelectPhrase + " " + sLeftString + " "+ sJoin + " " + sRightString+ " ON   (" + sCondition + ")" + " ) "+  aliasID;
+        //String sQuery = "from (select * from " + sLeftString + " "+ sJoin + " " + sRightString+ " ON   (" + sCondition + ")" + " ) "+  aliasID;
+        StateManager.setContext(context);
+
+        //String sQuery = "from (  "  + sLeftString + " "+ sJoin + " " + sRightString+ " ON   (" + sCondition + ")" + " ) "+  aliasID;
         //String sQuery = "from (select * from " + sLeftString + " "+ sJoin + " " + sRightString+ " ON   (" + sCondition + ")" + " ) "+  aliasID;
         StateManager.setContext(context);
         result = new HashMap<String, String>();
