@@ -2,24 +2,25 @@ package org.wso2.carbon.siddhihive.core.internal;
 
 
 import org.apache.log4j.Logger;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.event.stream.manager.core.exception.EventStreamConfigurationException;
 import org.wso2.carbon.siddhihive.core.configurations.Context;
 import org.wso2.carbon.siddhihive.core.configurations.StreamDefinitionExt;
 import org.wso2.carbon.siddhihive.core.headerprocessor.HeaderHandler;
+import org.wso2.carbon.siddhihive.core.internal.ds.SiddhiHiveValueHolder;
 import org.wso2.carbon.siddhihive.core.tablecreation.CSVTableCreator;
 import org.wso2.carbon.siddhihive.core.selectorprocessor.QuerySelectorProcessor;
 import org.wso2.carbon.siddhihive.core.tablecreation.CassandraTableCreator;
 import org.wso2.carbon.siddhihive.core.tablecreation.TableCreatorBase;
 import org.wso2.carbon.siddhihive.core.utils.Constants;
+import org.wso2.carbon.siddhihive.core.utils.SiddhiHiveToolBoxCreator;
 import org.wso2.carbon.siddhihive.core.utils.enums.*;
 import org.wso2.siddhi.query.api.definition.StreamDefinition;
 import org.wso2.siddhi.query.api.query.Query;
 import org.wso2.siddhi.query.api.query.input.Stream;
 import org.wso2.siddhi.query.api.query.output.stream.OutStream;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -278,20 +279,7 @@ public class SiddhiHiveManager {
         for (int j = 0; j < arrCreate.length; j++) {
             inputCreate += arrCreate[j];
             inputCreate += "\n";
-        }
-
-        if (headerMap.get(Constants.TIME_WINDOW_FREQUENCY) != null && !isScheduled) {
-            isScheduled = true;
-            schedule(Long.valueOf(headerMap.get(Constants.TIME_WINDOW_FREQUENCY)).longValue());
-        } else if ( ( (concurrentSelectorMap.get(Constants.LENGTH_WINDOW_FREQUENCY) != null) ||  ( (concurrentSelectorMap.get(Constants.LENGTH_WINDOW_BATCH_FREQUENCY) != null)   ) ) && !isScheduled) {
-            isScheduled = true;
-            long scheduleTime = getScheduleTime(concurrentSelectorMap, Constants.LENGTH_WINDOW_FREQUENCY, Constants.LENGTH_WINDOW_BATCH_FREQUENCY);
-            schedule(scheduleTime);
-        }else if ( ( (headerMap.get(Constants.LENGTH_WINDOW_FREQUENCY) != null) ||  ( (headerMap.get(Constants.LENGTH_WINDOW_BATCH_FREQUENCY) != null)   ) ) && !isScheduled) {
-            isScheduled = true;
-            long scheduleTime = getScheduleTime(headerMap, Constants.LENGTH_WINDOW_FREQUENCY, Constants.LENGTH_WINDOW_BATCH_FREQUENCY);
-            schedule(scheduleTime);
-        }
+        }       
 
 
         String fromClause = headerMap.get(Constants.FROM_CLAUSE);
@@ -326,14 +314,36 @@ public class SiddhiHiveManager {
 
         String incrementalClause = headerMap.get(Constants.INCREMENTAL_CLAUSE);
 
-        if (incrementalClause == null)
+        if (incrementalClause == null) {
             incrementalClause = " ";
+        } else {
+            incrementalEnabled = true;
+        }
 
        // hiveQuery = outputQuery + "\n" + incrementalClause + "\n" + fromClause + "\n " + selectQuery + "\n " + groupByQuery + "\n " + havingQuery + "\n " + whereClause + "\n ";
-        hiveQuery = initializationScript  +  inputCreate + "\n" + outputCreate +"\n" + incrementalClause + "\n" + "\n" +  Constants.INITIALIZATION_STATEMENT + "\n" + outputInsertQuery + "\n" + selectQuery + "\n " + fromClause + "\n " +whereClause + "\n " + groupByQuery + "\n " + havingQuery +";" + "\n " + Constants.EXECUTION_FINALIZER + ";" + "\n";
-
+        hiveQuery = initializationScript  +  inputCreate + "\n" + outputCreate +"\n" + incrementalClause + "\n" + "\n" +  Constants.INITIALIZATION_STATEMENT + "\n" + outputInsertQuery + "\n" + selectQuery + "\n " + fromClause + "\n " +whereClause + "\n " + groupByQuery + "\n " + havingQuery + "\n " +";";
+        List<String> streamDefs = new ArrayList<String>();
+        for (Map.Entry entry : streamDefinitionMap.entrySet()) {
+            if (isInputStream((StreamDefinitionExt) entry.getValue())) {
+                streamDefs.add(getOriginalStreamDefinition((StreamDefinitionExt) entry.getValue()));
+            }
+        }
+        SiddhiHiveToolBoxCreator siddhiHiveToolBoxCreator = new SiddhiHiveToolBoxCreator(streamDefs, hiveQuery);
+        siddhiHiveToolBoxCreator.createToolBox(incrementalEnabled);
         context.reset();
         StateManager.setContext(context);
+        if (headerMap.get(Constants.TIME_WINDOW_FREQUENCY) != null && !isScheduled) {
+            isScheduled = true;
+            schedule(Long.valueOf(headerMap.get(Constants.TIME_WINDOW_FREQUENCY)).longValue());
+        } else if (((concurrentSelectorMap.get(Constants.LENGTH_WINDOW_FREQUENCY) != null) || ((concurrentSelectorMap.get(Constants.LENGTH_WINDOW_BATCH_FREQUENCY) != null))) && !isScheduled) {
+            isScheduled = true;
+            long scheduleTime = getScheduleTime(concurrentSelectorMap, Constants.LENGTH_WINDOW_FREQUENCY, Constants.LENGTH_WINDOW_BATCH_FREQUENCY);
+            schedule(scheduleTime);
+        } else if (((headerMap.get(Constants.LENGTH_WINDOW_FREQUENCY) != null) || ((headerMap.get(Constants.LENGTH_WINDOW_BATCH_FREQUENCY) != null))) && !isScheduled) {
+            isScheduled = true;
+            long scheduleTime = getScheduleTime(headerMap, Constants.LENGTH_WINDOW_FREQUENCY, Constants.LENGTH_WINDOW_BATCH_FREQUENCY);
+            schedule(scheduleTime);
+        }
         return hiveQuery;
 
     }
@@ -381,6 +391,31 @@ public class SiddhiHiveManager {
         }
 
         return scheduleFinalValue;
+    }
+
+    private Boolean isInputStream(StreamDefinitionExt streamDefinitionExt) {
+        if (streamDefinitionExt.getFullQualifiedStreamID().equals(streamDefinitionExt.getStreamDefinition().getStreamId())) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private String getOriginalStreamDefinition(StreamDefinitionExt streamDefinitionExt) {
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        String streamId = streamDefinitionExt.getFullQualifiedStreamID();
+        org.wso2.carbon.databridge.commons.StreamDefinition streamDefinition = null;
+        try {
+            streamDefinition = SiddhiHiveValueHolder.getInstance().getEventStreamService().getStreamDefinition(streamId, tenantId);
+        } catch (EventStreamConfigurationException e) {
+            e.printStackTrace();
+        }
+        if (streamDefinition != null) {
+            return streamDefinition.toString();
+        } else {
+            log.error("No stream definition found for stream id " + streamId);
+            return null;
+        }
     }
 
 
