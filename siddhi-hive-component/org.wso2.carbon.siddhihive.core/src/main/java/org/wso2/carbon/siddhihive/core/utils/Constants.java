@@ -56,7 +56,7 @@ public final class Constants {
     public static final String HAVING_QUERY = "havingQuery";
     public static final String LENGTH_WIND_FROM_QUERY = "lengthWndFromQuery";
     public static final String LENGTH_BATCH_WIND_FROM_QUERY = "lengthBatchWndFromQuery";
-    public static final String DEFAULT_SLIDING_FREQUENCY = "600";
+    public static final String DEFAULT_SLIDING_FREQUENCY = "10000";
     public static final String LENGTH_WINDOW = "length";
     public static final String LENGTH_BATCH_WINDOW = "lengthBatch";
     public static final String INITALIZATION_SCRIPT= "initialization_Script";
