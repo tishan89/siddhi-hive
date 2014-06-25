@@ -51,7 +51,7 @@ public class LengthWindowStreamHandler extends WindowStreamHandler {
 
         this.windowStream = (WindowStream) stream;
 
-        schedulingFreq = String.valueOf(Constants.LENGTH_WINDOW_FREQUENCY_TIME);
+        schedulingFreq = String.valueOf(Constants.DEFAULT_LENGTH_WINDOW_FREQUENCY_TIME);
         initializeWndVariables();
         selectParamsClause = generateWindowSelectClause(); //SELECT     StockExchangeStream.symbol  , StockExchangeStream.price , StockExchangeStream.timestamps
         limitClause = generateLimitLength();
