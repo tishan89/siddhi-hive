@@ -329,13 +329,14 @@ public class SiddhiHiveManager {
             }
         }
         SiddhiHiveToolBoxCreator siddhiHiveToolBoxCreator = new SiddhiHiveToolBoxCreator(streamDefs, hiveQuery);
-        siddhiHiveToolBoxCreator.createToolBox(incrementalEnabled);
+        Long freq = getSlidingFreq(headerMap.get(Constants.TIME_WINDOW_FREQUENCY), headerMap.get(Constants.TIME_BATCH_WINDOW_FREQUENCY), headerMap.get(Constants.LENGTH_WINDOW_FREQUENCY), headerMap.get(Constants.LENGTH_WINDOW_BATCH_FREQUENCY));
+        siddhiHiveToolBoxCreator.createToolBox(incrementalEnabled, freq);
         context.reset();
         StateManager.setContext(context);
-        if (headerMap.get(Constants.TIME_WINDOW_FREQUENCY) != null && !isScheduled) {
+        /*if (headerMap.get(Constants.TIME_WINDOW_FREQUENCY) != null && !isScheduled) {
             isScheduled = true;
             schedule(Long.valueOf(headerMap.get(Constants.TIME_WINDOW_FREQUENCY)).longValue());
-        } else if (((concurrentSelectorMap.get(Constants.LENGTH_WINDOW_FREQUENCY) != null) || ((concurrentSelectorMap.get(Constants.LENGTH_WINDOW_BATCH_FREQUENCY) != null))) && !isScheduled) {
+        } else if (((headerMap.get(Constants.LENGTH_WINDOW_FREQUENCY) != null) || ((concurrentSelectorMap.get(Constants.LENGTH_WINDOW_BATCH_FREQUENCY) != null))) && !isScheduled) {
             isScheduled = true;
             long scheduleTime = getScheduleTime(concurrentSelectorMap, Constants.LENGTH_WINDOW_FREQUENCY, Constants.LENGTH_WINDOW_BATCH_FREQUENCY);
             schedule(scheduleTime);
@@ -343,9 +344,31 @@ public class SiddhiHiveManager {
             isScheduled = true;
             long scheduleTime = getScheduleTime(headerMap, Constants.LENGTH_WINDOW_FREQUENCY, Constants.LENGTH_WINDOW_BATCH_FREQUENCY);
             schedule(scheduleTime);
-        }
+        }*/
         return hiveQuery;
 
+    }
+
+    private Long getSlidingFreq(String timeWindow, String timeBatchWindow, String lengthWindow, String lengthBatchWindow) {
+        List<Long> freq = new ArrayList<Long>();
+        if (timeWindow != null) {
+            freq.add(Long.parseLong(timeWindow));
+        }
+        if (timeBatchWindow != null) {
+            freq.add(Long.parseLong(timeBatchWindow));
+        }
+        if (lengthBatchWindow != null) {
+            freq.add(Long.parseLong(lengthBatchWindow));
+        }
+        if (lengthWindow != null) {
+            freq.add(Long.parseLong(lengthWindow));
+        }
+        if (freq.size() > 0) {
+            Collections.sort(freq);
+            return freq.get(0);
+        } else {
+            return Long.valueOf(0);
+        }
     }
 
     public void schedule(long timeInMillis) {
