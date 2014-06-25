@@ -83,7 +83,8 @@ public final class Constants {
     public static final String SCRIPT_FILE = "converted_hive_script";
     public static final String SCRIPT_NAME = "script";
     public static final String ANALYZER_PROPERTY_FILE = "analyzers.properties";
-    public static final String FUNCTION_CALL_PARAM = "functionCall";
+    public static final String FUNCTION_JOIN_LEFT_CALL_PARAM = "leftFunctionCall";
+    public static final String FUNCTION_JOIN_RIGHT_CALL_PARAM = "rightFunctionCall";
 
     public static final String LENGTH_WINDOW_FREQUENCY = "lengthWndFrequency";
     public static final String LENGTH_WINDOW_BATCH_FREQUENCY = "lengthWndBatchFrequency";
