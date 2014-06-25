@@ -75,7 +75,7 @@ public class SiddhiHiveToolBoxCreator {
         List<String> propList = new ArrayList<String>();
         propList.add(Constants.ANALYZER_SCRIPTS + "." + scriptName + "." + Constants.FILE_NAME + "=" + fileName);
         propList.add(Constants.ANALYZER_SCRIPTS + "." + scriptName + "." + Constants.DESCRIPTION + "=" + Constants.DEFAULT_ANALYZER_DESCRIPTION);
-        if (schedulingTime != null) {
+        if (schedulingTime > 0) {
             CronExpressionCreator cronExpressionCreator = new CronExpressionCreator();
             String cron = cronExpressionCreator.getCronExpression(schedulingTime);
             propList.add(Constants.ANALYZER_SCRIPTS + "." + scriptName + "." + Constants.CRON + "=" + cron);
