@@ -79,6 +79,13 @@ public class Context {
         return subQueryIdentifier;
     }
 
+    public String generatePreviousSubQueryIdentifier(){
+
+        String subQueryIdentifier = "subq" + String.valueOf(subQueryCounter - 1);
+
+        return subQueryIdentifier;
+    }
+
     public String getSelectionAttributeRename(String rename) {
         return this.selectionAttributeRenameMap.get(rename);
     }
