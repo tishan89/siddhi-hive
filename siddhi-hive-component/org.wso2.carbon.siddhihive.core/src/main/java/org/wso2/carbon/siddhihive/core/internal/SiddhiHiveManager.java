@@ -37,21 +37,21 @@ public class SiddhiHiveManager {
     // private Map<String, String> queryMap= null;
     //private Map<String, String> inputStreamReferenceIDMap= null;// map to maintain both the stream ID and stream reference ID
 
-    private Map<String, String> inputStreamGeneratedQueryMap = null; // reference ID <-----> Replacement generatedQueryID
-    private Map<String, String> cachedValuesMap= null; //parent refernce
+    //private Map<String, String> inputStreamGeneratedQueryMap = null; // reference ID <-----> Replacement generatedQueryID
+   // private Map<String, String> cachedValuesMap= null; //parent refernce
    // private Map<String, String> inputStreamGeneratedQueryMap= null; // reference ID <-----> Replacement generatedQueryID
 
-    private ProcessingLevel processingLevel;
-    private InputStreamProcessingLevel inputStreamProcessingLevel;
-    private SelectorProcessingLevel selectorProcessingLevel;
-    private WindowStreamProcessingLevel windowStreamProcessingLevel;
-    private WindowProcessingLevel windowProcessingLevel;
-
-    private int subQueryCounter = 0;
-
-    private Map<String, String> selectionAttributeRenameMap = null;
-
-    private Map<String, String> referenceIDAliasMap = null;
+//    private ProcessingLevel processingLevel;
+//    private InputStreamProcessingLevel inputStreamProcessingLevel;
+//    private SelectorProcessingLevel selectorProcessingLevel;
+//    private WindowStreamProcessingLevel windowStreamProcessingLevel;
+//    private WindowProcessingLevel windowProcessingLevel;
+//
+//    private int subQueryCounter = 0;
+//
+//    private Map<String, String> selectionAttributeRenameMap = null;
+//
+//    private Map<String, String> referenceIDAliasMap = null;
     private Boolean isScheduled = false;
     private Query query;
 
@@ -61,10 +61,10 @@ public class SiddhiHiveManager {
         //New Query Map
         // queryMap = new ConcurrentHashMap<String, String>();
         //inputStreamReferenceIDMap = new ConcurrentHashMap<String, String>();
-        cachedValuesMap = new ConcurrentHashMap<String, String>();
-        inputStreamGeneratedQueryMap = new ConcurrentHashMap<String, String>();
-        selectionAttributeRenameMap = new ConcurrentHashMap<String, String>();
-        referenceIDAliasMap = new ConcurrentHashMap<String, String>();
+//        cachedValuesMap = new ConcurrentHashMap<String, String>();
+//        inputStreamGeneratedQueryMap = new ConcurrentHashMap<String, String>();
+//        selectionAttributeRenameMap = new ConcurrentHashMap<String, String>();
+//        referenceIDAliasMap = new ConcurrentHashMap<String, String>();
 
         Context context = new Context();
         StateManager.setContext(context);
@@ -87,127 +87,6 @@ public class SiddhiHiveManager {
         for (StreamDefinitionExt definition : streamDefinitionList) {
             streamDefinitionMap.put(definition.getStreamDefinition().getStreamId(), definition);
         }
-    }
-
-//    public String getStreamReferenceID(String referenceID) {
-//
-//        String streamID = inputStreamReferenceIDMap.get(referenceID);
-//
-//        if(  streamID != null)
-//            return streamID;
-//
-//        return null;
-//    }
-
-    public String getStreamGeneratedQueryID(String referenceID) {
-        return inputStreamGeneratedQueryMap.get(referenceID);
-    }
-//    public String getStreamGeneratedQueryID(String referenceID){
-//        return inputStreamGeneratedQueryMap.get(referenceID);
-//    }
-//
-//    public void addStreamGeneratedQueryID(String referenceID, String streamGeneratedQueryID){
-//         inputStreamGeneratedQueryMap.put(referenceID, streamGeneratedQueryID);
-//    }
-
-    public void addStreamGeneratedQueryID(String referenceID, String streamGeneratedQueryID) {
-        inputStreamGeneratedQueryMap.put(referenceID, streamGeneratedQueryID);
-    }
-
-//    public void setInputStreamReferenceID(String referenceID, String streamID) {
-//        this.inputStreamReferenceIDMap.put(referenceID, streamID);
-//    }
-
-    public void addCachedValues(String cachedID, String cachedValue) {
-        this.cachedValuesMap.put(cachedID, cachedValue);
-    }
-
-    public String getCachedValues(String cachedID) {
-
-        String cachedValue = cachedValuesMap.get(cachedID);
-
-        if (cachedValue != null) {
-            return cachedValue;
-        } else {
-
-            if (cachedValuesMap.containsValue(cachedID))
-                return cachedID;
-        }
-        return null;
-    }
-
-    public String generateSubQueryIdentifier() {
-
-        String subQueryIdentifier = "subq" + String.valueOf(++subQueryCounter);
-
-        return subQueryIdentifier;
-    }
-
-    public String getSelectionAttributeRenameMap(String rename) {
-        return this.selectionAttributeRenameMap.get(rename);
-    }
-
-    public void addSelectionStringMap(String rename, String selectionString) {
-        this.selectionAttributeRenameMap.put(rename, selectionString);
-    }
-
-    public ProcessingLevel getProcessingLevel() {
-        return processingLevel;
-    }
-
-    public void setProcessingLevel(ProcessingLevel processingLevel) {
-
-
-        this.processingLevel = processingLevel;
-    }
-
-
-    public SelectorProcessingLevel getSelectorProcessingLevel() {
-        return selectorProcessingLevel;
-    }
-
-    public void setSelectorProcessingLevel(SelectorProcessingLevel selectorProcessingLevel) {
-        this.selectorProcessingLevel = selectorProcessingLevel;
-    }
-
-    public InputStreamProcessingLevel getInputStreamProcessingLevel() {
-        return inputStreamProcessingLevel;
-    }
-
-    public void setInputStreamProcessingLevel(InputStreamProcessingLevel inputStreamProcessingLevel) {
-        this.inputStreamProcessingLevel = inputStreamProcessingLevel;
-    }
-
-    public WindowStreamProcessingLevel getWindowStreamProcessingLevel() {
-        return windowStreamProcessingLevel;
-    }
-
-    public void setWindowStreamProcessingLevel(WindowStreamProcessingLevel windowStreamProcessingLevel) {
-        this.windowStreamProcessingLevel = windowStreamProcessingLevel;
-    }
-
-    public WindowProcessingLevel getWindowProcessingLevel() {
-        return windowProcessingLevel;
-    }
-
-    public void setWindowProcessingLevel(WindowProcessingLevel windowProcessingLevel) {
-        this.windowProcessingLevel = windowProcessingLevel;
-    }
-
-    public void removedCachedValues(String cachedID) {
-
-        this.cachedValuesMap.remove(cachedID);
-    }
-
-    public String getReferenceIDAlias(String referenceID) {
-
-        String alias = referenceIDAliasMap.get(referenceID);
-
-        return alias;
-    }
-
-    public void setReferenceIDAlias(String referenceID, String alias) {
-        this.referenceIDAliasMap.put(referenceID, alias);
     }
 
     public void setSiddhiStreamDefinition(List<StreamDefinition> streamDefinitionList) {
@@ -333,18 +212,7 @@ public class SiddhiHiveManager {
         siddhiHiveToolBoxCreator.createToolBox(incrementalEnabled, freq);
         context.reset();
         StateManager.setContext(context);
-        /*if (headerMap.get(Constants.TIME_WINDOW_FREQUENCY) != null && !isScheduled) {
-            isScheduled = true;
-            schedule(Long.valueOf(headerMap.get(Constants.TIME_WINDOW_FREQUENCY)).longValue());
-        } else if (((headerMap.get(Constants.LENGTH_WINDOW_FREQUENCY) != null) || ((concurrentSelectorMap.get(Constants.LENGTH_WINDOW_BATCH_FREQUENCY) != null))) && !isScheduled) {
-            isScheduled = true;
-            long scheduleTime = getScheduleTime(concurrentSelectorMap, Constants.LENGTH_WINDOW_FREQUENCY, Constants.LENGTH_WINDOW_BATCH_FREQUENCY);
-            schedule(scheduleTime);
-        } else if (((headerMap.get(Constants.LENGTH_WINDOW_FREQUENCY) != null) || ((headerMap.get(Constants.LENGTH_WINDOW_BATCH_FREQUENCY) != null))) && !isScheduled) {
-            isScheduled = true;
-            long scheduleTime = getScheduleTime(headerMap, Constants.LENGTH_WINDOW_FREQUENCY, Constants.LENGTH_WINDOW_BATCH_FREQUENCY);
-            schedule(scheduleTime);
-        }*/
+
         return hiveQuery;
 
     }

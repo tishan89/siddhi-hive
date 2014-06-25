@@ -38,9 +38,6 @@ public class LengthWindowStreamHandler extends WindowStreamHandler {
 
     private String firstSelectClause = null;
     private String secondSelectClause = null;
-  //  private String functionCall = null;
-
-   // private int subqueryCounter = 0;
 
     public LengthWindowStreamHandler(){
 
@@ -98,22 +95,10 @@ public class LengthWindowStreamHandler extends WindowStreamHandler {
         else
             wndSubQueryIdentifier = streamReferenceID;
 
-        //context.addStreamGeneratedQueryID(streamReferenceID,wndSubQueryIdentifier);
-        //getSiddhiHiveManager().addCachedValues(this.windowStream.getStreamId(), wndSubQueryIdentifier);
-        //context.addCachedValues("STREAM_ID", wndSubQueryIdentifier);
         context.setReferenceIDAlias(streamReferenceID, wndSubQueryIdentifier);
         context.setWindowStreamProcessingLevel(WindowStreamProcessingLevel.LENGTH_WINDOW_PROCESSING);
 
         StateManager.setContext(context);
-//        LengthWndStreamInfo
-// .Holder lengthWndStreamInfoHolder = new StreamRelationshipHolder();
-//        lengthWndStreamInfoHolder.setStreamReferenceID(streamReferenceID);
-//        lengthWndStreamInfoHolder.initializeWndVariables(subQueryIdentifier);
-//        lengthWndStreamInfoHolder.setStreamID(streamID);
-//        getSiddhiHiveManager().setLengthWndStreamInfoHolder(streamReferenceID, lengthWndStreamInfoHolder);
-
-
-       // return subQueryIdentifier;
     }
 
     private void finalizeWndVariable(){
