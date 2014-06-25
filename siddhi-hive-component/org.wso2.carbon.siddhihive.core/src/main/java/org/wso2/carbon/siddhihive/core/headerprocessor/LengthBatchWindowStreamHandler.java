@@ -51,7 +51,7 @@ public class LengthBatchWindowStreamHandler extends WindowStreamHandler{
 
         this.windowStream = (WindowStream) stream;
         initializeWndVariables();
-        schedulingFreq = String.valueOf(Constants.LENGTH_WINDOW_BATCH_FREQUENCY_TIME);
+        schedulingFreq = String.valueOf(Constants.DEFAULT_LENGTH_WINDOW_BATCH_FREQUENCY_TIME);
 
         initializationScript = generateInitializationScript();
         selectParamsClause = generateWindowSelectClause(); //SELECT     StockExchangeStream.symbol  , StockExchangeStream.price , StockExchangeStream.timestamps
