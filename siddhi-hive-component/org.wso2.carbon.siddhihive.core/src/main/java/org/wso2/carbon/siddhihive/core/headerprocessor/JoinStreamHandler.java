@@ -98,44 +98,17 @@ public class JoinStreamHandler implements StreamHandler {
                     break;
             }
 
-            //int starStringIndex = sRightString.indexOf("\\*");
-
             String s1 = sRightString.substring(0,count+1);
             String s2 = sRightString.substring(count+1,sRightString.length());
 
             sRightString =  s1 + " , " + appendingRightSelectPhrase + " " + " as ABC " + s2;
 
-//            String[] rightStreamSplit = sRightString.split("\\*");
-//            rightStreamSplit[0] = rightStreamSplit[0] + appendingRightSelectPhrase + " " + " as ABC ";
-//
-//            sRightString = " ";
-//
-//            for(int i = 0; i < rightStreamSplit.length; i++){
-//                sRightString += rightStreamSplit[i];
-//            }
-
         }
 
-//        if(mapRightStream.get(Constants.LENGTH_WIND_FROM_QUERY) != null){
-//            appendingLeftSelectPhrase = mapRightStream.get(Constants.FUNCTION_JOIN_LEFT_CALL_PARAM);
-//            appendingLeftSelectPhrase = " (select *, " + appendingLeftSelectPhrase + "  from  (    ";
-//            String  rightStreamAlias = mapRightStream.get("ALIAS");
-//
-//            if(rightStreamAlias != null){
-//                rightStreamAlias = " )" + rightStreamAlias;
-//            }
-//
-//            sRightString = appendingLeftSelectPhrase + sRightString + " ) "+ rightStreamAlias;
-//        }
-        //    if(mapRightStream.get(Constants.LENGTH_BATCH_WIND_FROM_QUERY) != null)
 
         String sQuery = "from (  " + appendingLeftSelectPhrase + " " + sLeftString + " "+ sJoin + " " + sRightString+ " ON   (" + sCondition + ")" + " ) "+  aliasID;
-        //String sQuery = "from (select * from " + sLeftString + " "+ sJoin + " " + sRightString+ " ON   (" + sCondition + ")" + " ) "+  aliasID;
         StateManager.setContext(context);
 
-        //String sQuery = "from (  "  + sLeftString + " "+ sJoin + " " + sRightString+ " ON   (" + sCondition + ")" + " ) "+  aliasID;
-        //String sQuery = "from (select * from " + sLeftString + " "+ sJoin + " " + sRightString+ " ON   (" + sCondition + ")" + " ) "+  aliasID;
-        StateManager.setContext(context);
         result = new HashMap<String, String>();
 
         String leftInitializationScript = mapLeftStream.get(Constants.INITALIZATION_SCRIPT);
@@ -149,6 +122,17 @@ public class JoinStreamHandler implements StreamHandler {
         if(rightInitializationScript != null)
             initializationScript += rightInitializationScript + "\n";
 
+        String incrementalClause = "";
+        String rightIncrementalClause = mapRightStream.get(Constants.INCREMENTAL_CLAUSE);
+        String leftIncrementalClause = mapLeftStream.get(Constants.INCREMENTAL_CLAUSE);
+
+        if(leftIncrementalClause != null)
+            incrementalClause = leftIncrementalClause + "\n";
+
+        if(rightIncrementalClause != null)
+            incrementalClause += rightIncrementalClause + "\n";
+
+
         if(initializationScript.isEmpty() == false)
             result.put(Constants.INITALIZATION_SCRIPT, initializationScript);
 
@@ -159,6 +143,9 @@ public class JoinStreamHandler implements StreamHandler {
 
         if(result.get(Constants.LENGTH_WINDOW_FREQUENCY) != null)
             result.put(Constants.LENGTH_WINDOW_FREQUENCY, result.get(Constants.LENGTH_WINDOW_FREQUENCY) );
+
+        if( (incrementalClause != null ) && (incrementalClause.isEmpty() == false) )
+            result.put(Constants.INCREMENTAL_CLAUSE, incrementalClause);
 
         result.put(Constants.JOIN_CLAUSE, sQuery);
         return result;

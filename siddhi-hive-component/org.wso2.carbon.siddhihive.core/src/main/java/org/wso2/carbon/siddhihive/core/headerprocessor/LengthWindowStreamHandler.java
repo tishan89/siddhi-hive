@@ -51,7 +51,7 @@ public class LengthWindowStreamHandler extends WindowStreamHandler {
 
         this.windowStream = (WindowStream) stream;
 
-        schedulingFreq = String.valueOf(Constants.LENGTH_WINDOW_FREQUENCY_TIME);
+        schedulingFreq = String.valueOf(Constants.DEFAULT_LENGTH_WINDOW_FREQUENCY_TIME);
         initializeWndVariables();
         selectParamsClause = generateWindowSelectClause(); //SELECT     StockExchangeStream.symbol  , StockExchangeStream.price , StockExchangeStream.timestamps
         limitClause = generateLimitLength();
@@ -83,9 +83,6 @@ public class LengthWindowStreamHandler extends WindowStreamHandler {
        StateManager.setContext(context);
 
         return Constants.FROM + "  " + Constants.OPENING_BRACT + "   " + firstSelectClause + "\n" + whereClause + Constants.CLOSING_BRACT + aliasID ;
-        //return Constants.FROM + "  " + Constants.OPENING_BRACT + "   " + firstSelectClause + "\n" + whereClause + Constants.CLOSING_BRACT + aliasID ;
-//        return Constants.FROM + "  " + Constants.OPENING_BRACT + "   " + selectParamsClause + " " + Constants.FROM  + "  " + windowStream.getStreamId()  + limitClause + "   " + Constants.CLOSING_BRACT + wndSubQueryIdentifier +
-//               "\n" + " " + whereClause + "  ";
     }
 
     private void initializeWndVariables(){

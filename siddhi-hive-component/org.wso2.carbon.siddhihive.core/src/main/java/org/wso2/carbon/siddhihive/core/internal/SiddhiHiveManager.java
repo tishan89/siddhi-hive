@@ -285,7 +285,7 @@ public class SiddhiHiveManager {
         String fromClause = headerMap.get(Constants.FROM_CLAUSE);
         if (fromClause == null)
             fromClause = headerMap.get(Constants.LENGTH_WIND_FROM_QUERY);
-        else
+        if(fromClause == null)
             fromClause = headerMap.get(Constants.LENGTH_BATCH_WIND_FROM_QUERY);
 
         if (fromClause == null)
