@@ -19,7 +19,6 @@ public final class Constants {
     public static final String WHERE_CLAUSE = "whereClause";
     public static final String INCREMENTAL_CLAUSE = "incremental";
 
-    public static final String TIME_WINDOW_FREQUENCY = "timeWindowFrequency";
 
     public static final String META = "meta";
     public static final String CORRELATION = "correlation";
@@ -56,7 +55,6 @@ public final class Constants {
     public static final String HAVING_QUERY = "havingQuery";
     public static final String LENGTH_WIND_FROM_QUERY = "lengthWndFromQuery";
     public static final String LENGTH_BATCH_WIND_FROM_QUERY = "lengthBatchWndFromQuery";
-    public static final String DEFAULT_SLIDING_FREQUENCY = "10000";
     public static final String LENGTH_WINDOW = "length";
     public static final String LENGTH_BATCH_WINDOW = "lengthBatch";
     public static final String INITALIZATION_SCRIPT= "initialization_Script";
@@ -89,9 +87,11 @@ public final class Constants {
 
     public static final String LENGTH_WINDOW_FREQUENCY = "lengthWndFrequency";
     public static final String LENGTH_WINDOW_BATCH_FREQUENCY = "lengthWndBatchFrequency";
-    public static final String LENGTH_WINDOW_FREQUENCY_TIME = "600";
-    public static final String LENGTH_WINDOW_BATCH_FREQUENCY_TIME = "2000";
-
+    public static final String DEFAULT_LENGTH_WINDOW_FREQUENCY_TIME = "600";
+    public static final String DEFAULT_LENGTH_WINDOW_BATCH_FREQUENCY_TIME = "2000";
+    public static final String TIME_WINDOW_FREQUENCY = "timeWindowFrequency";
+    public static final String TIME_BATCH_WINDOW_FREQUENCY = "timeWindowFrequency";
+    public static final String DEFAULT_SLIDING_FREQUENCY = "10000";
 
     public static final String ANALYZER_STRING = "analyzer resolvePath(path=\"file://${CARBON_HOME}/repository/components/lib/udf_SiddhiHive.jar\");";
     public static final String HIVE_AUX_JAR    = "set hive.aux.jars.path=${hiveconf:FILE_PATH};";
@@ -99,4 +99,5 @@ public final class Constants {
     public static final String EXECUTION_INITIALIZER   ="class org.wso2.siddhihive.analytics.ScriptExecutionInitializer;";
     public static final String INITIALIZATION_STATEMENT = ANALYZER_STRING + "\n" + HIVE_AUX_JAR + "\n" + TEMP_FUNCTION + "\n" + EXECUTION_INITIALIZER + "\n";
     public static final String EXECUTION_FINALIZER  ="class org.wso2.siddhihive.analytics.ScriptExecutionFinalizer";
+    public static final String CRON = "cron";
 }
