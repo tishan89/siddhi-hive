@@ -25,7 +25,7 @@ public class SelectorProcessorSample {
         SiddhiManager siddhiManager = new SiddhiManager();
 
         siddhiManager.defineStream("define stream StockExchangeStream ( symbol string, price int )");
-        siddhiManager.defineStream("define stream FastMovingStockQuotes ( symbol string, avgPrice double )");
+        siddhiManager.defineStream("define stream FastMovingStockQuotes ( symbol string, price int, averagePrice double )");
 //        String queryID = siddhiManager.addQuery(" from StockExchangeStream[price >= 20]#window.time(50) " +
 //                                                " select symbol, avg(price) as avgPrice " +
 //                " group by symbol having avgPrice > 50 " +
@@ -65,10 +65,25 @@ public class SelectorProcessorSample {
 
 
 
-           String queryID = siddhiManager.addQuery(" from StockExchangeStream[symbol == \"Apple\"]#window.length(10) \n" +
-                "join FastMovingStockQuotes#window.lengthBatch(15)  \n" +
-                " on StockExchangeStream.symbol == FastMovingStockQuotes.symbol  select *\n" +
-                "insert into JoinStream;");
+            String queryID = siddhiManager.addQuery(" from StockExchangeStream[symbol == \"Apple\"]#window.time(6000) \n" +
+                    "select symbol,price, avg(price) as averagePrice  \n" +
+                    "group by symbol \n" +
+                    " having ((price > averagePrice*1.02) or (averagePrice*0.98 > price ))\n" +
+                    "insert into FastMovingStockQuotes;");
+
+//           String queryID = siddhiManager.addQuery(" from StockExchangeStream[symbol == \"Apple\"]#window.time(6000) \n" +
+//                "join FastMovingStockQuotes#window.lengthBatch(15)  \n" +
+//                " on StockExchangeStream.symbol == FastMovingStockQuotes.symbol  select *\n" +
+//                "insert into JoinStream;");
+
+
+            /**
+             * from AllStockQuotes#window.time(600000)
+             select symbol,price, avg(price) as averagePrice
+             group by symbol
+             having ((price > averagePrice*1.02) or (averagePrice*0.98 > price ))
+             insert into FastMovingStockQuotes;
+             */
 
 
         Query query = siddhiManager.getQuery(queryID);
