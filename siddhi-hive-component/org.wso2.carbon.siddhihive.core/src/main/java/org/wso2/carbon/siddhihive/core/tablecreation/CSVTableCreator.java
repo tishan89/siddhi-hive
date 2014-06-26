@@ -17,10 +17,12 @@ public final class CSVTableCreator extends TableCreatorBase {
 			return null;
 		
 		fillHiveFieldString();
-		
-		sCSVQuery = ("CREATE TABLE IF NOT EXISTS " + sDBName + " (" + sHiveColumns + ") " +
+
+        sCSVQuery = "DROP TABLE IF EXISTS " +  sDBName + " ;\n";
+
+		sCSVQuery += ("CREATE TABLE IF NOT EXISTS " + sDBName + " (" + sHiveColumns + ") " +
 				"ROW FORMAT DELIMITED FIELDS TERMINATED BY ','" + " " +  "STORED AS SEQUENCEFILE" + ";");
-		
+
 		return sCSVQuery;
 	}
 }
