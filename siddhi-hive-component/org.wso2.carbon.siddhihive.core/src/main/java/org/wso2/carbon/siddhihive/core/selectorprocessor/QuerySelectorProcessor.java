@@ -156,7 +156,7 @@ public class QuerySelectorProcessor {
                     groupBy += " , ";
             }
         }
-
+        groupBy += ", " + Constants.TIMESTAMPS_COLUMN;
         return groupBy;
     }
 
