@@ -23,12 +23,14 @@ public class SiddhiHiveToolBoxCreator {
     }
 
     public void createToolBox(Boolean incrementalProcessingEnabled, Long schedulingTime) {
-        File parentDir = new File(Constants.TOOL_BOX_DIRECTORY);
-        parentDir.mkdirs();
+        File wrapper = new File(Constants.TOOL_BOX_DIRECTORY);
+        wrapper.mkdir();
+        File parentDir = new File(wrapper, Constants.TOOL_BOX_DIRECTORY);
+        parentDir.mkdir();
         File streamDir = new File(parentDir, Constants.STREAM_DEF_DIRECTORY);
-        streamDir.mkdirs();
+        streamDir.mkdir();
         File analyticDir = new File(parentDir, Constants.ANALYTICS_DIRECTORY);
-        analyticDir.mkdirs();
+        analyticDir.mkdir();
         List<String> defName = new ArrayList<String>();
         List<String> fileName = new ArrayList<String>();
 
@@ -48,7 +50,7 @@ public class SiddhiHiveToolBoxCreator {
         writeToFile(analyticDir, Constants.ANALYZER_PROPERTY_FILE, analyzerProp);
 
         ZipppingUtil zipppingUtil = new ZipppingUtil();
-        zipppingUtil.zip(Constants.TOOL_BOX_DIRECTORY + ".tbox", parentDir);
+        zipppingUtil.zip(Constants.TOOL_BOX_DIRECTORY + ".tbox", wrapper);
     }
 
     public String getStreamProperties(List<String> stremDefs, List<String> fileNames, Boolean incrementalProcessingEnabled) {
