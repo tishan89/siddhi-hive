@@ -200,7 +200,7 @@ public class SiddhiHiveManager {
         }
 
        // hiveQuery = outputQuery + "\n" + incrementalClause + "\n" + fromClause + "\n " + selectQuery + "\n " + groupByQuery + "\n " + havingQuery + "\n " + whereClause + "\n ";
-        hiveQuery = initializationScript  +  inputCreate + "\n" + outputCreate +"\n" + incrementalClause + "\n" + "\n" +  Constants.INITIALIZATION_STATEMENT + "\n" + outputInsertQuery + "\n" + selectQuery + "\n " + fromClause + "\n " +whereClause + "\n " + groupByQuery + "\n " + havingQuery + "\n " +";";
+        hiveQuery = initializationScript  +  inputCreate + "\n" + outputCreate +"\n" + "\n" +  Constants.INITIALIZATION_STATEMENT + "\n" + incrementalClause + "\n" + outputInsertQuery + "\n" + selectQuery + "\n " + fromClause + "\n " +whereClause + "\n " + groupByQuery + "\n " + havingQuery + "\n " +";";
         List<String> streamDefs = new ArrayList<String>();
         for (Map.Entry entry : streamDefinitionMap.entrySet()) {
             if (isInputStream((StreamDefinitionExt) entry.getValue())) {
