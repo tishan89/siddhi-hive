@@ -39,9 +39,9 @@ public final class CassandraTableCreator extends TableCreatorBase {
     //**********************************************************************************************
     private void fillCassandraProperties() {
         fillCassandraColumnString();
-
+        String[] streamID = sFullStreamID.split(":");
         sCassandraProperties = ("\"wso2.carbon.datasource.name\" = \""+ Constants.CASSANDRA_DATASOURCE+"\", "
-                + "\"cassandra.cf.name\" = \""+sFullStreamID.replaceAll(Pattern.quote("."), "_")+"\", "
+                + "\"cassandra.cf.name\" = \"" + streamID[0].replaceAll(Pattern.quote("."), "_") + "\", "
                 + "\"cassandra.columns.mapping\" = \""+sCassandraColumns+"\"");
     }
 
